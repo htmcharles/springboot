@@ -13,7 +13,7 @@ public class Staff {
     private String firstName;
     private String lastName;
 
-    @Column(name = "email", nullable = false, length = 50) // Corrected 'nullable' spelling
+    @Column(name = "email", nullable = false, length = 50, unique = true) // Added unique=true constraint
     private String email;
 
     // Default constructor
