@@ -43,31 +43,41 @@ public class HotelbookingsystemApplication {
 				rooms.add(room3);
 				rrepo.saveAll(rooms);
 
-				// Create Guests
-				Address address1 = new Address("123 Main St", "Kigali", "Rwanda");
-				Address address2 = new Address("456 Park Ave", "Kigali", "Rwanda");
+				// Create Guests with auto-generated IDs
+				Address address1 = new Address("Nyabihu", "Mukamira", "23 Main St");
+				Address address2 = new Address("Nyabihu", "Mukamira", "23 Main St");
 
-				Guest guest1 = new Guest(1, "Alice Johnson", "+250788123456", "alice@email.com", address1);
-				Guest guest2 = new Guest(2, "Bob Wilson", "+250789123456", "bob@email.com", address2);
+				Guest guest1 = new Guest(null, "Alice Johnson", "+250788123456", "alice@email.com", address1);
+				Guest guest2 = new Guest(null, "Bob Wilson", "+250789123456", "bob@email.com", address2);
 				List<Guest> guests = new ArrayList<>();
 				guests.add(guest1);
 				guests.add(guest2);
 				grepo.saveAll(guests);
 
-				// Create Bookings
+				// Now retrieve the saved guests to get their generated IDs
+				List<Guest> savedGuests = grepo.findAll();
+				Guest savedGuest1 = savedGuests.get(0);
+				Guest savedGuest2 = savedGuests.get(1);
+
+				// Create Bookings with auto-generated IDs
 				Date checkIn = new Date();
 				Date checkOut = new Date(checkIn.getTime() + (7 * 24 * 60 * 60 * 1000L)); // 7 days later
 
-				Booking booking1 = new Booking(1, room1, guest1, checkIn, checkOut);
-				Booking booking2 = new Booking(2, room2, guest2, checkIn, checkOut);
+				Booking booking1 = new Booking(null, room1, savedGuest1, checkIn, checkOut);
+				Booking booking2 = new Booking(null, room2, savedGuest2, checkIn, checkOut);
 				List<Booking> bookings = new ArrayList<>();
 				bookings.add(booking1);
 				bookings.add(booking2);
 				brepo.saveAll(bookings);
 
-				// Create Payments
-				Payment payment1 = new Payment(1, booking1, 700.0, "Completed");
-				Payment payment2 = new Payment(2, booking2, 1400.0, "Completed");
+				// Now retrieve the saved bookings to get their generated IDs
+				List<Booking> savedBookings = brepo.findAll();
+				Booking savedBooking1 = savedBookings.get(0);
+				Booking savedBooking2 = savedBookings.get(1);
+
+				// Create Payments with auto-generated IDs
+				Payment payment1 = new Payment(null, savedBooking1, 700.0, "Completed");
+				Payment payment2 = new Payment(null, savedBooking2, 1400.0, "Completed");
 				List<Payment> payments = new ArrayList<>();
 				payments.add(payment1);
 				payments.add(payment2);
