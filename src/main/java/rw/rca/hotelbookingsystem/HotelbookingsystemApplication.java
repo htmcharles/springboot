@@ -28,8 +28,18 @@ public class HotelbookingsystemApplication {
 				// Create Staff members
 				Staff staff1 = new Staff("john.doe@hotel.com", "Doe", "John");
 				Staff staff2 = new Staff("jane.smith@hotel.com", "Smith", "Jane");
-				srepo.save(staff1);
-				srepo.save(staff2);
+				Staff staff3 = new Staff("bob.johnson@hotel.com", "Johnson", "Bob");
+				Staff staff4 = new Staff("mary.williams@hotel.com", "Williams", "Mary");
+
+				// Create a list of staff members
+				List<Staff> staffList = new ArrayList<>();
+				staffList.add(staff1);
+				staffList.add(staff2);
+				staffList.add(staff3);
+				staffList.add(staff4);
+
+				// Save all staff members at once
+				srepo.saveAll(staffList);
 
 				// Create Rooms
 				Room room1 = new Room("101", "Standard", 100.0, "Available");
@@ -53,8 +63,12 @@ public class HotelbookingsystemApplication {
 				staff1.assignRoom(room2);
 				staff2.assignRoom(room2);
 				staff2.assignRoom(room3);
-				srepo.save(staff1);
-				srepo.save(staff2);
+				staff3.assignRoom(room1);
+				staff3.assignRoom(room3);
+				staff4.assignRoom(room2);
+
+				// Update all staff members with their room assignments
+				srepo.saveAll(staffList);
 
 				// Create Booking using the bidirectional relationship helper methods
 				Date checkIn = new Date();
