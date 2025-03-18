@@ -24,6 +24,9 @@ public class Booking {
     @Temporal(TemporalType.DATE)
     private Date checkOut;
 
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
+    private Payment payment;
+
     public Booking(Integer bookingID, Room room, Guest guest, Date checkIn, Date checkOut) {
         this.bookingID = bookingID;
         this.room = room;
@@ -74,5 +77,13 @@ public class Booking {
 
     public void setCheckOut(Date checkOut) {
         this.checkOut = checkOut;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 }

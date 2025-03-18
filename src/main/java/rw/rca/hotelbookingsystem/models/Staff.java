@@ -1,6 +1,8 @@
 package rw.rca.hotelbookingsystem.models;
 
 import jakarta.persistence.*; // Correct import for JPA annotations
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "staff") // Provide a table name
@@ -15,6 +17,14 @@ public class Staff {
 
     @Column(name = "email", nullable = false, length = 50, unique = true) // Added unique=true constraint
     private String email;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "staff_room_assignment",
+        joinColumns = @JoinColumn(name = "staff_id"),
+        inverseJoinColumns = @JoinColumn(name = "room_id")
+    )
+    private Set<Room> assignedRooms = new HashSet<>();
 
     // Default constructor
     public Staff() {}
@@ -65,5 +75,22 @@ public class Staff {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Set<Room> getAssignedRooms() {
+        return assignedRooms;
+    }
+
+    public void setAssignedRooms(Set<Room> assignedRooms) {
+        this.assignedRooms = assignedRooms;
+    }
+
+    // Helper methods for the relationship
+    public void assignRoom(Room room) {
+        this.assignedRooms.add(room);
+    }
+
+    public void unassignRoom(Room room) {
+        this.assignedRooms.remove(room);
     }
 }

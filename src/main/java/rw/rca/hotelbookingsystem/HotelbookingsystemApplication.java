@@ -28,20 +28,16 @@ public class HotelbookingsystemApplication {
 				// Create Staff members
 				Staff staff1 = new Staff("john.doe@hotel.com", "Doe", "John");
 				Staff staff2 = new Staff("jane.smith@hotel.com", "Smith", "Jane");
-				List<Staff> staffs = new ArrayList<>();
-				staffs.add(staff1);
-				staffs.add(staff2);
-				srepo.saveAll(staffs);
+				srepo.save(staff1);
+				srepo.save(staff2);
 
 				// Create Rooms
 				Room room1 = new Room("101", "Standard", 100.0, "Available");
 				Room room2 = new Room("102", "Deluxe", 200.0, "Available");
 				Room room3 = new Room("201", "Suite", 300.0, "Available");
-				List<Room> rooms = new ArrayList<>();
-				rooms.add(room1);
-				rooms.add(room2);
-				rooms.add(room3);
-				rrepo.saveAll(rooms);
+				rrepo.save(room1);
+				rrepo.save(room2);
+				rrepo.save(room3);
 
 				// Create Guests with auto-generated IDs
 				Address address1 = new Address("Nyabihu", "Mukamira", "23 Main St");
@@ -49,39 +45,43 @@ public class HotelbookingsystemApplication {
 
 				Guest guest1 = new Guest(null, "Alice Johnson", "+250788123456", "alice@email.com", address1);
 				Guest guest2 = new Guest(null, "Bob Wilson", "+250789123456", "bob@email.com", address2);
-				List<Guest> guests = new ArrayList<>();
-				guests.add(guest1);
-				guests.add(guest2);
-				grepo.saveAll(guests);
+				grepo.save(guest1);
+				grepo.save(guest2);
 
-				// Now retrieve the saved guests to get their generated IDs
-				List<Guest> savedGuests = grepo.findAll();
-				Guest savedGuest1 = savedGuests.get(0);
-				Guest savedGuest2 = savedGuests.get(1);
+				// Create ManyToMany relationship between Staff and Room
+				staff1.assignRoom(room1);
+				staff1.assignRoom(room2);
+				staff2.assignRoom(room2);
+				staff2.assignRoom(room3);
+				srepo.save(staff1);
+				srepo.save(staff2);
 
-				// Create Bookings with auto-generated IDs
+				// Create Booking using the bidirectional relationship helper methods
 				Date checkIn = new Date();
 				Date checkOut = new Date(checkIn.getTime() + (7 * 24 * 60 * 60 * 1000L)); // 7 days later
 
-				Booking booking1 = new Booking(null, room1, savedGuest1, checkIn, checkOut);
-				Booking booking2 = new Booking(null, room2, savedGuest2, checkIn, checkOut);
-				List<Booking> bookings = new ArrayList<>();
-				bookings.add(booking1);
-				bookings.add(booking2);
-				brepo.saveAll(bookings);
+				Booking booking1 = new Booking(null, room1, guest1, checkIn, checkOut);
+				Booking booking2 = new Booking(null, room2, guest2, checkIn, checkOut);
 
-				// Now retrieve the saved bookings to get their generated IDs
-				List<Booking> savedBookings = brepo.findAll();
-				Booking savedBooking1 = savedBookings.get(0);
-				Booking savedBooking2 = savedBookings.get(1);
+				// Use helper methods to establish bidirectional relationships
+				guest1.addBooking(booking1);
+				guest2.addBooking(booking2);
 
-				// Create Payments with auto-generated IDs
-				Payment payment1 = new Payment(null, savedBooking1, 700.0, "Completed");
-				Payment payment2 = new Payment(null, savedBooking2, 1400.0, "Completed");
-				List<Payment> payments = new ArrayList<>();
-				payments.add(payment1);
-				payments.add(payment2);
-				prepo.saveAll(payments);
+				// Save the bookings
+				brepo.save(booking1);
+				brepo.save(booking2);
+
+				// Create Payments with OneToOne relationship
+				Payment payment1 = new Payment(null, booking1, 700.0, "Completed");
+				Payment payment2 = new Payment(null, booking2, 1400.0, "Completed");
+
+				// Establish bidirectional relationship
+				booking1.setPayment(payment1);
+				booking2.setPayment(payment2);
+
+				// Save the payments
+				prepo.save(payment1);
+				prepo.save(payment2);
 
 				// Print confirmation
 				System.out.println("Test data created successfully:");
@@ -90,6 +90,14 @@ public class HotelbookingsystemApplication {
 				System.out.println("Guests: " + grepo.count());
 				System.out.println("Bookings: " + brepo.count());
 				System.out.println("Payments: " + prepo.count());
+
+				// Print relationship information
+				System.out.println("\nRelationship Information:");
+				System.out.println("Staff " + staff1.getFirstName() + " is assigned to " + staff1.getAssignedRooms().size() + " rooms");
+				System.out.println("Guest " + guest1.getName() + " has " + guest1.getBookings().size() + " bookings");
+				System.out.println("Room " + room1.getRoomNumber() + " has " + room1.getBookings().size() + " bookings and "
+								 + room1.getAssignedStaff().size() + " staff assigned");
+				System.out.println("Booking ID " + booking1.getBookingID() + " has payment: " + (booking1.getPayment() != null));
 			} else {
 				System.out.println("Test data already exists, skipping initialization");
 			}

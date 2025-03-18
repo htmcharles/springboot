@@ -1,6 +1,10 @@
 package rw.rca.hotelbookingsystem.models;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "room")
@@ -21,6 +25,12 @@ public class Room {
 
     @Column(name = "status", nullable = false, length = 20)
     private String status;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    private List<Booking> bookings = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "assignedRooms")
+    private Set<Staff> assignedStaff = new HashSet<>();
 
     // Default constructor
     public Room() {}
@@ -81,5 +91,33 @@ public class Room {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
+
+    // Helper method to add booking
+    public void addBooking(Booking booking) {
+        bookings.add(booking);
+        booking.setRoom(this);
+    }
+
+    // Helper method to remove booking
+    public void removeBooking(Booking booking) {
+        bookings.remove(booking);
+        booking.setRoom(null);
+    }
+
+    public Set<Staff> getAssignedStaff() {
+        return assignedStaff;
+    }
+
+    public void setAssignedStaff(Set<Staff> assignedStaff) {
+        this.assignedStaff = assignedStaff;
     }
 }

@@ -1,7 +1,8 @@
 package rw.rca.hotelbookingsystem.models;
 
 import jakarta.persistence.*;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "guest")
@@ -16,6 +17,9 @@ public class Guest {
 
     @Embedded
     private Address address;
+
+    @OneToMany(mappedBy = "guest", cascade = CascadeType.ALL)
+    private List<Booking> bookings = new ArrayList<>();
 
     public Guest(Integer guestID, String name, String phone, String email, Address address) {
         this.guestID = guestID;
@@ -67,5 +71,25 @@ public class Guest {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
+
+    // Helper method to add booking
+    public void addBooking(Booking booking) {
+        bookings.add(booking);
+        booking.setGuest(this);
+    }
+
+    // Helper method to remove booking
+    public void removeBooking(Booking booking) {
+        bookings.remove(booking);
+        booking.setGuest(null);
     }
 }
