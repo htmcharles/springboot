@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StaffRepository extends JpaRepository<Staff, Integer> {
-    Optional<Staff> findByCode(Integer code);
-    Optional<Staff> findByEmail(String email);
-    List<Staff> findByFirstName(String firstName);
+    Staff findByCode(Integer code);
+    Staff findByEmail(String email);
+    Staff findByFirstName(String firstName);
     List<Staff> findByLastName(String lastName);
     List<Staff> findByFirstNameIgnoreCase(String firstName);
     List<Staff> findByLastNameIgnoreCase(String lastName);
