@@ -1,5 +1,6 @@
 package rw.rca.hotelbookingsystem.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*; // Correct import for JPA annotations
 import java.util.HashSet;
 import java.util.Set;
@@ -18,6 +19,7 @@ public class Staff {
     @Column(name = "email", nullable = false, length = 50, unique = true) // Added unique=true constraint
     private String email;
 
+    @JsonManagedReference
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "staff_room_assignment",

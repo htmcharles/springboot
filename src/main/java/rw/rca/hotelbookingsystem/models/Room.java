@@ -1,5 +1,6 @@
 package rw.rca.hotelbookingsystem.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ public class Room {
     @Column(name = "status", nullable = false, length = 20)
     private String status;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Booking> bookings = new ArrayList<>();
 

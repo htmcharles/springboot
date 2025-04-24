@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+import rw.rca.hotelbookingsystem.controllers.StaffController;
+import rw.rca.hotelbookingsystem.models.Address;
+import rw.rca.hotelbookingsystem.models.PaymentStatus;
 import rw.rca.hotelbookingsystem.models.Staff;
 
 import java.util.List;
@@ -111,4 +114,17 @@ public interface StaffRepository extends JpaRepository<Staff, Integer> {
     @Transactional
     @Modifying @Query("DELETE FROM Staff s WHERE s.firstName = :firstName") void deleteByFirstNameBulk(@Param("firstName") String firstName);
     @Transactional @Modifying @Query("UPDATE Staff s SET s.lastName = :lastName WHERE s.code = :code") void updateLastNameByCode(@Param("lastName") String lastName, @Param("code") Integer code);
+
+    interface PaymentRepository extends JpaRepository<Address.Payment, Long> {
+        List<Address.Payment> findByBookingId(Long bookingId);
+        List<Address.Payment> findByUserId(Long userId);
+        List<Address.Payment> findByStatus(PaymentStatus status);
+    }
+
+    interface RoomRepository extends JpaRepository<StaffController.Room, Long> {
+        List<StaffController.Room> findByType(String type);
+        List<StaffController.Room> findByPricePerNightBetween(Double minPrice, Double maxPrice);
+        List<StaffController.Room> findByCapacity(Integer capacity);
+        List<StaffController.Room> findByIsAvailableTrue();
+    }
 }

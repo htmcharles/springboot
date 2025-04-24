@@ -1,7 +1,9 @@
 package rw.rca.hotelbookingsystem.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "booking")
@@ -10,16 +12,18 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer bookingID;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "guest_id", nullable = false)
     private Guest guest;
 
-    @Temporal(TemporalType.DATE)
-    private Date checkIn;
+    @Column(nullable = false)
+    private LocalDate checkInDate;
 
     @Temporal(TemporalType.DATE)
     private Date checkOut;
@@ -31,7 +35,7 @@ public class Booking {
         this.bookingID = bookingID;
         this.room = room;
         this.guest = guest;
-        this.checkIn = checkIn;
+        this.checkInDate = checkIn.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
         this.checkOut = checkOut;
     }
 
@@ -63,12 +67,12 @@ public class Booking {
         this.guest = guest;
     }
 
-    public Date getCheckIn() {
-        return checkIn;
+    public LocalDate getCheckInDate() {
+        return checkInDate;
     }
 
-    public void setCheckIn(Date checkIn) {
-        this.checkIn = checkIn;
+    public void setCheckInDate(LocalDate checkInDate) {
+        this.checkInDate = checkInDate;
     }
 
     public Date getCheckOut() {
