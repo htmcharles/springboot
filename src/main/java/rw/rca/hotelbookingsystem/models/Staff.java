@@ -1,12 +1,18 @@
 package rw.rca.hotelbookingsystem.models;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*; // Correct import for JPA annotations
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "staff") // Provide a table name
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class,
+    property = "code"
+)
 public class Staff {
 
     @Id
@@ -19,13 +25,13 @@ public class Staff {
     @Column(name = "email", nullable = false, length = 50, unique = true) // Added unique=true constraint
     private String email;
 
-    @JsonManagedReference
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "staff_room_assignment",
         joinColumns = @JoinColumn(name = "staff_id"),
         inverseJoinColumns = @JoinColumn(name = "room_id")
     )
+    @JsonIgnore
     private Set<Room> assignedRooms = new HashSet<>();
 
     // Default constructor

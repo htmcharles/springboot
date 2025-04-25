@@ -1,7 +1,9 @@
 package rw.rca.hotelbookingsystem.models;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -9,6 +11,10 @@ import java.util.Set;
 
 @Entity
 @Table(name = "room")
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class,
+    property = "id"
+)
 public class Room {
 
     @Id
@@ -30,7 +36,7 @@ public class Room {
     @Column(name = "capacity")
     private Integer capacity;
 
-    @JsonManagedReference
+    @JsonManagedReference(value = "room-bookings")
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Booking> bookings = new ArrayList<>();
 

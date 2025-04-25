@@ -1,6 +1,7 @@
 package rw.rca.hotelbookingsystem.models;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,6 +13,7 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference(value = "user-reviews")
     private User user;
 
     @ManyToOne

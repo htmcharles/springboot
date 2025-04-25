@@ -1,30 +1,36 @@
 package rw.rca.hotelbookingsystem.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.Date;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "booking")
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class,
+    property = "bookingID"
+)
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer bookingID;
 
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
+    @JsonBackReference(value = "room-bookings")
     private Room room;
 
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "guest_id", nullable = false)
+    @JsonBackReference(value = "guest-bookings")
     private Guest guest;
 
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference(value = "user-bookings")
     private User user;
 
     @Column(nullable = false)
