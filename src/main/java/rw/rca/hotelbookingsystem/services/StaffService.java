@@ -22,6 +22,10 @@ public class StaffService {
     }
 
     public Staff findByName(String name) {
-        return  staffRepo.findByFirstName(name);
+        Staff staff = staffRepo.findByFirstName(name);
+        if (staff == null) {
+            throw new RuntimeException("Staff not found with name: " + name);
+        }
+        return staff;
     }
 }

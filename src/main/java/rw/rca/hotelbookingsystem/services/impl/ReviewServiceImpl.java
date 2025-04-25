@@ -1,52 +1,59 @@
 package rw.rca.hotelbookingsystem.services.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rw.rca.hotelbookingsystem.models.Review;
+import rw.rca.hotelbookingsystem.repositories.ReviewRepository;
 import rw.rca.hotelbookingsystem.services.ReviewService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
 
+    @Autowired
+    private ReviewRepository reviewRepository;
+
     @Override
     public Review createReview(Review review) {
-        // TODO: Implement review creation logic
-        return review;
+        review.setCreatedAt(LocalDateTime.now());
+        return reviewRepository.save(review);
     }
 
     @Override
     public Review getReviewById(Long id) {
-        // TODO: Implement get review by ID logic
-        return null;
+        return reviewRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Review not found"));
     }
 
     @Override
     public List<Review> getRoomReviews(Long roomId) {
-        // TODO: Implement get room reviews logic
-        return null;
+        return reviewRepository.findByRoomId(roomId);
     }
 
     @Override
     public List<Review> getUserReviews(Long userId) {
-        // TODO: Implement get user reviews logic
-        return null;
+        return reviewRepository.findByUserId(userId);
     }
 
     @Override
     public Review updateReview(Long id, Review review) {
-        // TODO: Implement update review logic
-        return review;
+        Review existingReview = getReviewById(id);
+        existingReview.setRating(review.getRating());
+        existingReview.setComment(review.getComment());
+        existingReview.setUpdatedAt(LocalDateTime.now());
+        return reviewRepository.save(existingReview);
     }
 
     @Override
     public void deleteReview(Long id) {
-        // TODO: Implement delete review logic
+        reviewRepository.deleteById(id);
     }
 
     @Override
     public Double getRoomAverageRating(Long roomId) {
-        // TODO: Implement get room average rating logic
-        return 0.0;
+        Double average = reviewRepository.findAverageRatingByRoomId(roomId);
+        return average != null ? average : 0.0;
     }
 }

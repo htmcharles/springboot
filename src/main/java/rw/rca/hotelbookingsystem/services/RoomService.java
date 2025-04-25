@@ -1,15 +1,14 @@
 package rw.rca.hotelbookingsystem.services;
 
-import rw.rca.hotelbookingsystem.controllers.StaffController;
-
+import rw.rca.hotelbookingsystem.models.Room;
 import java.util.List;
 
 public interface RoomService {
-    List<StaffController.Room> getAllRooms();
-    StaffController.Room getRoomById(Long id);
-    StaffController.Room createRoom(StaffController.Room room);
-    StaffController.Room updateRoom(Long id, StaffController.Room room);
-    void deleteRoom(Long id);
-    List<StaffController.Room> searchRooms(String type, Double minPrice, Double maxPrice, Integer capacity);
-    List<StaffController.Room> getAvailableRooms(String checkInDate, String checkOutDate);
+    List<Room> getAllRooms();
+    Room getRoomById(Integer id);
+    Room createRoom(Room room);
+    Room updateRoom(Integer id, Room room);
+    void deleteRoom(Integer id);
+    List<Room> searchRooms(String type, Double minPrice, Double maxPrice, Integer capacity);
+    List<Room> getAvailableRooms(String checkInDate, String checkOutDate);
 }

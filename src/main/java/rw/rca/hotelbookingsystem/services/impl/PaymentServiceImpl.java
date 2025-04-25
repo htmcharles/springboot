@@ -1,47 +1,57 @@
 package rw.rca.hotelbookingsystem.services.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import rw.rca.hotelbookingsystem.models.Address;
+import rw.rca.hotelbookingsystem.models.Payment;
+import rw.rca.hotelbookingsystem.models.PaymentStatus;
+import rw.rca.hotelbookingsystem.repositories.PaymentRepository;
 import rw.rca.hotelbookingsystem.services.PaymentService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @Override
-    public Address.Payment processPayment(Address.Payment payment) {
-        // TODO: Implement payment processing logic
-        return payment;
+    public Payment processPayment(Payment payment) {
+        payment.setStatus(PaymentStatus.COMPLETED);
+        payment.setPaymentDate(LocalDateTime.now());
+        return paymentRepository.save(payment);
     }
 
     @Override
-    public Address.Payment getPaymentById(Long id) {
-        // TODO: Implement get payment by ID logic
-        return null;
+    public Payment getPaymentById(Integer id) {
+        return paymentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
     }
 
     @Override
-    public List<Address.Payment> getPaymentsByBooking(Long bookingId) {
-        // TODO: Implement get payments by booking logic
-        return null;
+    public List<Payment> getPaymentsByBooking(Integer bookingId) {
+        return paymentRepository.findByBooking_BookingID(bookingId);
     }
 
     @Override
-    public Address.Payment processRefund(Long id) {
-        // TODO: Implement refund processing logic
-        return null;
+    public Payment processRefund(Integer id) {
+        Payment payment = getPaymentById(id);
+        payment.setStatus(PaymentStatus.REFUNDED);
+        payment.setRefundDate(LocalDateTime.now());
+        return paymentRepository.save(payment);
     }
 
     @Override
-    public List<Address.Payment> getUserPayments(Long userId) {
-        // TODO: Implement get user payments logic
-        return null;
+    public List<Payment> getPaymentsByGuest(Integer guestId) {
+        // Since we don't have a direct method for this, we'll need to get payments through bookings
+        return paymentRepository.findAll().stream()
+                .filter(payment -> payment.getBooking().getGuest().getGuestID().equals(guestId))
+                .toList();
     }
 
     @Override
-    public List<Address.Payment> getPaymentsByStatus(String status) {
-        // TODO: Implement get payments by status logic
-        return null;
+    public List<Payment> getPaymentsByStatus(String status) {
+        return paymentRepository.findByStatus(PaymentStatus.valueOf(status.toUpperCase()));
     }
 }

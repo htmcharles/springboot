@@ -7,9 +7,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-import rw.rca.hotelbookingsystem.controllers.StaffController;
-import rw.rca.hotelbookingsystem.models.Address;
-import rw.rca.hotelbookingsystem.models.PaymentStatus;
 import rw.rca.hotelbookingsystem.models.Staff;
 
 import java.util.List;
@@ -70,36 +67,68 @@ public interface StaffRepository extends JpaRepository<Staff, Integer> {
     Boolean existsByLastName(String lastName);
     Boolean existsByFirstNameAndLastName(String firstName, String lastName);
     //Custom Queries (JPQL and Native SQL)
-    @Query("SELECT s FROM Staff s WHERE s.firstName = :firstName") List<Staff> findByFirstNameCustom(@Param("firstName") String firstName);
-    @Query("SELECT s FROM Staff s WHERE s.lastName = :lastName") List<Staff> findByLastNameCustom(@Param("lastName") String lastName);
-    @Query("SELECT s FROM Staff s WHERE s.email = :email") Optional<Staff> findByEmailCustom(@Param("email") String email);
-    @Query("SELECT s FROM Staff s ORDER BY s.firstName ASC") List<Staff> findAllOrderByFirstName();
-    @Query("SELECT s FROM Staff s ORDER BY s.lastName DESC") List<Staff> findAllOrderByLastNameDesc();
-    @Query("SELECT s FROM Staff s WHERE LOWER(s.email) LIKE LOWER(CONCAT('%', :emailPart, '%'))") List<Staff> findByEmailLikeIgnoreCase(@Param("emailPart") String emailPart);
-    @Query(value = "SELECT * FROM staff WHERE email = ?1", nativeQuery = true) Optional<Staff> findByEmailNative(String email);
-    @Query(value = "SELECT * FROM staff ORDER BY first_name ASC", nativeQuery = true) List<Staff> findAllOrderByFirstNameNative();
-    @Query(value = "SELECT COUNT(*) FROM staff WHERE last_name = ?1", nativeQuery = true) Long countByLastNameNative(String lastName);
+    @Query("SELECT s FROM Staff s WHERE s.firstName = :firstName")
+    List<Staff> findByFirstNameCustom(@Param("firstName") String firstName);
+
+    @Query("SELECT s FROM Staff s WHERE s.lastName = :lastName")
+    List<Staff> findByLastNameCustom(@Param("lastName") String lastName);
+
+    @Query("SELECT s FROM Staff s WHERE s.email = :email")
+    Optional<Staff> findByEmailCustom(@Param("email") String email);
+
+    @Query("SELECT s FROM Staff s ORDER BY s.firstName ASC")
+    List<Staff> findAllOrderByFirstName();
+
+    @Query("SELECT s FROM Staff s ORDER BY s.lastName DESC")
+    List<Staff> findAllOrderByLastNameDesc();
+
+    @Query("SELECT s FROM Staff s WHERE LOWER(s.email) LIKE LOWER(CONCAT('%', :emailPart, '%'))")
+    List<Staff> findByEmailLikeIgnoreCase(@Param("emailPart") String emailPart);
+
+    @Query(value = "SELECT * FROM staff WHERE email = ?1", nativeQuery = true)
+    Optional<Staff> findByEmailNative(String email);
+
+    @Query(value = "SELECT * FROM staff ORDER BY first_name ASC", nativeQuery = true)
+    List<Staff> findAllOrderByFirstNameNative();
+
+    @Query(value = "SELECT COUNT(*) FROM staff WHERE last_name = ?1", nativeQuery = true)
+    Long countByLastNameNative(String lastName);
+
     //Deleting Methods
     void deleteByEmail(String email);
     void deleteByFirstName(String firstName);
     void deleteByLastName(String lastName);
     void deleteByCode(Integer code);
+
     @Modifying
-    @Query("DELETE FROM Staff s WHERE s.email = :email") void deleteByEmailCustom(@Param("email") String email);
+    @Query("DELETE FROM Staff s WHERE s.email = :email")
+    void deleteByEmailCustom(@Param("email") String email);
+
     //Updating Methods
-    @Modifying @Query("UPDATE Staff s SET s.firstName = :firstName WHERE s.email = :email") void updateFirstNameByEmail(@Param("firstName") String firstName, @Param("email") String email);
-    @Modifying @Query("UPDATE Staff s SET s.lastName = :lastName WHERE s.email = :email") void updateLastNameByEmail(@Param("lastName") String lastName, @Param("email") String email);
-    @Modifying @Query("UPDATE Staff s SET s.email = :newEmail WHERE s.email = :oldEmail") void updateEmail(@Param("newEmail") String newEmail, @Param("oldEmail") String oldEmail);
+    @Modifying
+    @Query("UPDATE Staff s SET s.firstName = :firstName WHERE s.email = :email")
+    void updateFirstNameByEmail(@Param("firstName") String firstName, @Param("email") String email);
+
+    @Modifying
+    @Query("UPDATE Staff s SET s.lastName = :lastName WHERE s.email = :email")
+    void updateLastNameByEmail(@Param("lastName") String lastName, @Param("email") String email);
+
+    @Modifying
+    @Query("UPDATE Staff s SET s.email = :newEmail WHERE s.email = :oldEmail")
+    void updateEmail(@Param("newEmail") String newEmail, @Param("oldEmail") String oldEmail);
+
     //Finding Distinct Values
     List<Staff> findDistinctByFirstName(String firstName);
     List<Staff> findDistinctByLastName(String lastName);
     List<Staff> findDistinctByEmail(String email);
     List<Staff> findDistinctByFirstNameAndLastName(String firstName, String lastName);
+
     //Limiting Results
     List<Staff> findTop5ByOrderByFirstNameAsc();
     List<Staff> findTop3ByOrderByLastNameDesc();
     List<Staff> findFirstByOrderByEmailAsc();
     List<Staff> findFirst5ByFirstNameOrderByLastNameAsc(String firstName);
+
     //Boolean Queries
     List<Staff> findByFirstNameIsNotNull();
     List<Staff> findByLastNameIsNotNull();
@@ -107,24 +136,19 @@ public interface StaffRepository extends JpaRepository<Staff, Integer> {
     List<Staff> findByFirstNameIsNull();
     List<Staff> findByLastNameIsNull();
     List<Staff> findByEmailIsNull();
+
     //Case Insensitive Sorting
     List<Staff> findByFirstNameOrderByLastNameAsc(String firstName);
     List<Staff> findByLastNameOrderByFirstNameDesc(String lastName);
+
     //Bulk Operations
     @Transactional
-    @Modifying @Query("DELETE FROM Staff s WHERE s.firstName = :firstName") void deleteByFirstNameBulk(@Param("firstName") String firstName);
-    @Transactional @Modifying @Query("UPDATE Staff s SET s.lastName = :lastName WHERE s.code = :code") void updateLastNameByCode(@Param("lastName") String lastName, @Param("code") Integer code);
+    @Modifying
+    @Query("DELETE FROM Staff s WHERE s.firstName = :firstName")
+    void deleteByFirstNameBulk(@Param("firstName") String firstName);
 
-    interface PaymentRepository extends JpaRepository<Address.Payment, Long> {
-        List<Address.Payment> findByBookingId(Long bookingId);
-        List<Address.Payment> findByUserId(Long userId);
-        List<Address.Payment> findByStatus(PaymentStatus status);
-    }
-
-    interface RoomRepository extends JpaRepository<StaffController.Room, Long> {
-        List<StaffController.Room> findByType(String type);
-        List<StaffController.Room> findByPricePerNightBetween(Double minPrice, Double maxPrice);
-        List<StaffController.Room> findByCapacity(Integer capacity);
-        List<StaffController.Room> findByIsAvailableTrue();
-    }
+    @Transactional
+    @Modifying
+    @Query("UPDATE Staff s SET s.lastName = :lastName WHERE s.code = :code")
+    void updateLastNameByCode(@Param("lastName") String lastName, @Param("code") Integer code);
 }

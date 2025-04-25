@@ -27,6 +27,9 @@ public class Room {
     @Column(name = "status", nullable = false, length = 20)
     private String status;
 
+    @Column(name = "capacity")
+    private Integer capacity;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Booking> bookings = new ArrayList<>();
@@ -37,21 +40,23 @@ public class Room {
     // Default constructor
     public Room() {}
 
-    // Constructor with all fields
-    public Room(Integer id, String roomNumber, String type, Double price, String status) {
+    // Constructor with all fields including capacity
+    public Room(Integer id, String roomNumber, String type, Double price, String status, Integer capacity) {
         this.id = id;
         this.roomNumber = roomNumber;
         this.type = type;
         this.price = price;
         this.status = status;
+        this.capacity = capacity;
     }
 
-    // Alternative constructor
-    public Room(String roomNumber, String type, Double price, String status) {
+    // Alternative constructor including capacity
+    public Room(String roomNumber, String type, Double price, String status, Integer capacity) {
         this.roomNumber = roomNumber;
         this.type = type;
         this.price = price;
         this.status = status;
+        this.capacity = capacity;
     }
 
     // Getters and Setters
@@ -93,6 +98,14 @@ public class Room {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
     }
 
     public List<Booking> getBookings() {

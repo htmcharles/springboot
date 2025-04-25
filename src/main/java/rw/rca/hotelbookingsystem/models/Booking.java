@@ -22,6 +22,11 @@ public class Booking {
     @JoinColumn(name = "guest_id", nullable = false)
     private Guest guest;
 
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Column(nullable = false)
     private LocalDate checkInDate;
 
@@ -31,16 +36,25 @@ public class Booking {
     @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
     private Payment payment;
 
-    public Booking(Integer bookingID, Room room, Guest guest, Date checkIn, Date checkOut) {
+    @Column(nullable = false)
+    private String status;
+
+    @Column(name = "total_price")
+    private Double totalPrice;
+
+    public Booking(Integer bookingID, Room room, Guest guest, User user, Date checkIn, Date checkOut, Double totalPrice) {
         this.bookingID = bookingID;
         this.room = room;
         this.guest = guest;
+        this.user = user;
         this.checkInDate = checkIn.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
         this.checkOut = checkOut;
+        this.status = "PENDING";
+        this.totalPrice = totalPrice;
     }
 
     public Booking() {
-
+        this.status = "PENDING";
     }
 
     public Integer getBookingID() {
@@ -67,6 +81,14 @@ public class Booking {
         this.guest = guest;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public LocalDate getCheckInDate() {
         return checkInDate;
     }
@@ -89,5 +111,21 @@ public class Booking {
 
     public void setPayment(Payment payment) {
         this.payment = payment;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }

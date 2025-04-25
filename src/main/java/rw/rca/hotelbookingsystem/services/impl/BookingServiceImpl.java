@@ -1,7 +1,9 @@
 package rw.rca.hotelbookingsystem.services.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import rw.rca.hotelbookingsystem.models.Address;
+import rw.rca.hotelbookingsystem.models.Booking;
+import rw.rca.hotelbookingsystem.repositories.BookingRepository;
 import rw.rca.hotelbookingsystem.services.BookingService;
 
 import java.util.List;
@@ -9,45 +11,71 @@ import java.util.List;
 @Service
 public class BookingServiceImpl implements BookingService {
 
+    @Autowired
+    private BookingRepository bookingRepository;
+
     @Override
-    public Address.Booking createBooking(Address.Booking booking) {
-        // TODO: Implement booking creation logic
-        return booking;
+    public Booking createBooking(Booking booking) {
+        return bookingRepository.save(booking);
     }
 
     @Override
-    public Address.Booking getBookingById(Long id) {
-        // TODO: Implement get booking by ID logic
-        return null;
+    public Booking getBookingById(Integer id) {
+        return bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found with ID: " + id));
     }
 
     @Override
-    public List<Address.Booking> getUserBookings(Long userId) {
-        // TODO: Implement get user bookings logic
-        return null;
+    public List<Booking> getUserBookings(Integer userId) {
+        List<Booking> bookings = bookingRepository.findByGuestGuestID(userId);
+        if (bookings.isEmpty()) {
+            throw new RuntimeException("No bookings found for user with ID: " + userId);
+        }
+        return bookings;
     }
 
     @Override
-    public Address.Booking cancelBooking(Long id) {
-        // TODO: Implement cancel booking logic
-        return null;
+    public Booking cancelBooking(Integer id) {
+        Booking booking = getBookingById(id);
+        if ("CANCELLED".equals(booking.getStatus())) {
+            throw new RuntimeException("Booking is already cancelled");
+        }
+        booking.setStatus("CANCELLED");
+        return bookingRepository.save(booking);
     }
 
     @Override
-    public Address.Booking checkIn(Long id) {
-        // TODO: Implement check-in logic
-        return null;
+    public Booking checkIn(Integer id) {
+        Booking booking = getBookingById(id);
+        if ("CHECKED_IN".equals(booking.getStatus())) {
+            throw new RuntimeException("Booking is already checked in");
+        }
+        if ("CANCELLED".equals(booking.getStatus())) {
+            throw new RuntimeException("Cannot check in a cancelled booking");
+        }
+        booking.setStatus("CHECKED_IN");
+        return bookingRepository.save(booking);
     }
 
     @Override
-    public Address.Booking checkOut(Long id) {
-        // TODO: Implement check-out logic
-        return null;
+    public Booking checkOut(Integer id) {
+        Booking booking = getBookingById(id);
+        if ("CHECKED_OUT".equals(booking.getStatus())) {
+            throw new RuntimeException("Booking is already checked out");
+        }
+        if (!"CHECKED_IN".equals(booking.getStatus())) {
+            throw new RuntimeException("Cannot check out a booking that is not checked in");
+        }
+        booking.setStatus("CHECKED_OUT");
+        return bookingRepository.save(booking);
     }
 
     @Override
-    public List<Address.Booking> getRoomBookings(Long roomId) {
-        // TODO: Implement get room bookings logic
-        return null;
+    public List<Booking> getRoomBookings(Integer roomId) {
+        List<Booking> bookings = bookingRepository.findByRoomId(roomId);
+        if (bookings.isEmpty()) {
+            throw new RuntimeException("No bookings found for room with ID: " + roomId);
+        }
+        return bookings;
     }
 }

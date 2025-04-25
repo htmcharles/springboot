@@ -1,8 +1,6 @@
 package rw.rca.hotelbookingsystem.models;
 
 import jakarta.persistence.*;
-import rw.rca.hotelbookingsystem.controllers.StaffController;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +16,7 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
-    private StaffController.Room room;
+    private Room room;
 
     @Column(nullable = false)
     private Integer rating;
@@ -31,6 +29,20 @@ public class Review {
 
     @Column
     private LocalDateTime updatedAt;
+
+    // Default constructor
+    public Review() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // Constructor with all fields
+    public Review(User user, Room room, Integer rating, String comment) {
+        this.user = user;
+        this.room = room;
+        this.rating = rating;
+        this.comment = comment;
+        this.createdAt = LocalDateTime.now();
+    }
 
     // Getters and Setters
     public Long getId() {
@@ -49,11 +61,11 @@ public class Review {
         this.user = user;
     }
 
-    public StaffController.Room getRoom() {
+    public Room getRoom() {
         return room;
     }
 
-    public void setRoom(StaffController.Room room) {
+    public void setRoom(Room room) {
         this.room = room;
     }
 
@@ -87,5 +99,12 @@ public class Review {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    // Helper method to update review
+    public void updateReview(Integer rating, String comment) {
+        this.rating = rating;
+        this.comment = comment;
+        this.updatedAt = LocalDateTime.now();
     }
 }

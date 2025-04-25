@@ -4,10 +4,16 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import rw.rca.hotelbookingsystem.models.*;
 import rw.rca.hotelbookingsystem.repositories.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -19,101 +25,115 @@ public class HotelbookingsystemApplication {
 	}
 
 	@Bean
-	CommandLineRunner commandLineRunner(StaffRepository srepo, GuestRepository grepo,
-									 RoomRepository rrepo, BookingRepository brepo,
-									 PaymentRepository prepo) {
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**")
+					.allowedOrigins("http://localhost:5173")
+					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+					.allowedHeaders("*")
+					.allowCredentials(true);
+			}
+		};
+	}
+
+	@Bean
+	CommandLineRunner initData(UserRepository userRepo, RoomRepository roomRepo,
+							 BookingRepository bookingRepo, PaymentRepository paymentRepo,
+							 ReviewRepository reviewRepo) {
 		return args -> {
 			// Only add test data if the repositories are empty
-			if (srepo.count() == 0 && grepo.count() == 0 && rrepo.count() == 0) {
-				// Create Staff members
-				Staff staff1 = new Staff("john.doe@hotel.com", "Doe", "John");
-				Staff staff2 = new Staff("jane.smith@hotel.com", "Smith", "Jane");
-				Staff staff3 = new Staff("bob.johnson@hotel.com", "Johnson", "Bob");
-				Staff staff4 = new Staff("mary.williams@hotel.com", "Williams", "Mary");
+			if (userRepo.count() == 0) {
+				// Create Address objects first
+				Address adminAddress = new Address();
+				adminAddress.setDistrict("Kigali");
+				adminAddress.setSector("Gasabo");
+				adminAddress.setStreetNO("12A");
 
-				// Create a list of staff members
-				List<Staff> staffList = new ArrayList<>();
-				staffList.add(staff1);
-				staffList.add(staff2);
-				staffList.add(staff3);
-				staffList.add(staff4);
+				Address customerAddress = new Address();
+				customerAddress.setDistrict("Kigali");
+				customerAddress.setSector("Gasabo");
+				customerAddress.setStreetNO("45B");
 
-				// Save all staff members at once
-				srepo.saveAll(staffList);
+				// Create Users with different roles
+				User admin = new User();
+				admin.setEmail("admin@hotel.com");
+				admin.setPassword("admin123");
+				admin.setFirstName("Admin");
+				admin.setLastName("User");
+				admin.setPhoneNumber("0788123456");
+				admin.setAddress(adminAddress);
+				admin.setRole(UserRole.ADMIN);
+				userRepo.save(admin);
+
+				User customer = new User();
+				customer.setEmail("john.doe@example.com");
+				customer.setPassword("securePassword123");
+				customer.setFirstName("John");
+				customer.setLastName("Doe");
+				customer.setPhoneNumber("0789123456");
+				customer.setAddress(customerAddress);
+				customer.setRole(UserRole.CUSTOMER);
+				userRepo.save(customer);
 
 				// Create Rooms
-				Room room1 = new Room("101", "Standard", 100.0, "Available");
-				Room room2 = new Room("102", "Deluxe", 200.0, "Available");
-				Room room3 = new Room("201", "Suite", 300.0, "Available");
-				rrepo.save(room1);
-				rrepo.save(room2);
-				rrepo.save(room3);
+				Room standardRoom = new Room();
+				standardRoom.setRoomNumber("101");
+				standardRoom.setType("Standard");
+				standardRoom.setPrice(100.0);
+				standardRoom.setStatus("AVAILABLE");
+				standardRoom.setCapacity(2);
+				roomRepo.save(standardRoom);
 
-				// Create Guests with auto-generated IDs
-				Address address1 = new Address("Nyabihu", "Mukamira", "23 Main St");
-				Address address2 = new Address("Nyabihu", "Mukamira", "23 Main St");
+				Room deluxeRoom = new Room();
+				deluxeRoom.setRoomNumber("201");
+				deluxeRoom.setType("Deluxe");
+				deluxeRoom.setPrice(200.0);
+				deluxeRoom.setStatus("AVAILABLE");
+				deluxeRoom.setCapacity(3);
+				roomRepo.save(deluxeRoom);
 
-				Guest guest1 = new Guest(null, "Alice Johnson", "+250788123456", "alice@email.com", address1);
-				Guest guest2 = new Guest(null, "Bob Wilson", "+250789123456", "bob@email.com", address2);
-				grepo.save(guest1);
-				grepo.save(guest2);
+				Room suiteRoom = new Room();
+				suiteRoom.setRoomNumber("301");
+				suiteRoom.setType("Suite");
+				suiteRoom.setPrice(300.0);
+				suiteRoom.setStatus("AVAILABLE");
+				suiteRoom.setCapacity(4);
+				roomRepo.save(suiteRoom);
 
-				// Create ManyToMany relationship between Staff and Room
-				staff1.assignRoom(room1);
-				staff1.assignRoom(room2);
-				staff2.assignRoom(room2);
-				staff2.assignRoom(room3);
-				staff3.assignRoom(room1);
-				staff3.assignRoom(room3);
-				staff4.assignRoom(room2);
+				// Create a Booking
+				Booking booking = new Booking();
+				booking.setUser(customer);
+				booking.setRoom(standardRoom);
+				booking.setCheckInDate(LocalDate.now());
+				LocalDate checkOutLocalDate = LocalDate.now().plusDays(2);
+				Date checkOutDate = Date.from(checkOutLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+				booking.setCheckOut(checkOutDate);
+				booking.setStatus("CONFIRMED");
+				booking.setTotalPrice(200.0);
+				bookingRepo.save(booking);
 
-				// Update all staff members with their room assignments
-				srepo.saveAll(staffList);
+				// Create a Payment
+				Payment payment = new Payment();
+				payment.setBooking(booking);
+				payment.setAmount(200.0);
+				payment.setPaymentDate(LocalDateTime.now());
+				payment.setPaymentMethod("CREDIT_CARD");
+				payment.setStatus(PaymentStatus.COMPLETED);
+				paymentRepo.save(payment);
 
-				// Create Booking using the bidirectional relationship helper methods
-				Date checkIn = new Date();
-				Date checkOut = new Date(checkIn.getTime() + (7 * 24 * 60 * 60 * 1000L)); // 7 days later
+				// Create Reviews
+				Review review = new Review();
+				review.setUser(customer);
+				review.setRoom(standardRoom);
+				review.setRating(5);
+				review.setComment("Excellent stay! Very clean and comfortable room.");
+				reviewRepo.save(review);
 
-				Booking booking1 = new Booking(null, room1, guest1, checkIn, checkOut);
-				Booking booking2 = new Booking(null, room2, guest2, checkIn, checkOut);
-
-				// Use helper methods to establish bidirectional relationships
-				guest1.addBooking(booking1);
-				guest2.addBooking(booking2);
-
-				// Save the bookings
-				brepo.save(booking1);
-				brepo.save(booking2);
-
-				// Create Payments with OneToOne relationship
-				Payment payment1 = new Payment(null, booking1, 700.0, "Completed");
-				Payment payment2 = new Payment(null, booking2, 1400.0, "Completed");
-
-				// Establish bidirectional relationship
-				booking1.setPayment(payment1);
-				booking2.setPayment(payment2);
-
-				// Save the payments
-				prepo.save(payment1);
-				prepo.save(payment2);
-
-				// Print confirmation
-				System.out.println("Test data created successfully:");
-				System.out.println("Staff members: " + srepo.count());
-				System.out.println("Rooms: " + rrepo.count());
-				System.out.println("Guests: " + grepo.count());
-				System.out.println("Bookings: " + brepo.count());
-				System.out.println("Payments: " + prepo.count());
-
-				// Print relationship information
-				System.out.println("\nRelationship Information:");
-				System.out.println("Staff " + staff1.getFirstName() + " is assigned to " + staff1.getAssignedRooms().size() + " rooms");
-				System.out.println("Guest " + guest1.getName() + " has " + guest1.getBookings().size() + " bookings");
-				System.out.println("Room " + room1.getRoomNumber() + " has " + room1.getBookings().size() + " bookings and "
-								 + room1.getAssignedStaff().size() + " staff assigned");
-				System.out.println("Booking ID " + booking1.getBookingID() + " has payment: " + (booking1.getPayment() != null));
+				System.out.println("Sample data has been created successfully!");
 			} else {
-				System.out.println("Test data already exists, skipping initialization");
+				System.out.println("Database already contains data, skipping initialization.");
 			}
 		};
 	}

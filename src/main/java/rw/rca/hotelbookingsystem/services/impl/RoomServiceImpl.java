@@ -1,52 +1,71 @@
 package rw.rca.hotelbookingsystem.services.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import rw.rca.hotelbookingsystem.controllers.StaffController;
+import rw.rca.hotelbookingsystem.models.Room;
+import rw.rca.hotelbookingsystem.repositories.RoomRepository;
 import rw.rca.hotelbookingsystem.services.RoomService;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RoomServiceImpl implements RoomService {
 
+    @Autowired
+    private RoomRepository roomRepository;
+
     @Override
-    public List<StaffController.Room> getAllRooms() {
-        // TODO: Implement get all rooms logic
-        return null;
+    public List<Room> getAllRooms() {
+        return roomRepository.findAll();
     }
 
     @Override
-    public StaffController.Room getRoomById(Long id) {
-        // TODO: Implement get room by ID logic
-        return null;
+    public Room getRoomById(Integer id) {
+        return roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
     }
 
     @Override
-    public StaffController.Room createRoom(StaffController.Room room) {
-        // TODO: Implement create room logic
-        return room;
+    public Room createRoom(Room room) {
+        return roomRepository.save(room);
     }
 
     @Override
-    public StaffController.Room updateRoom(Long id, StaffController.Room room) {
-        // TODO: Implement update room logic
-        return room;
+    public Room updateRoom(Integer id, Room room) {
+        Room existingRoom = getRoomById(id);
+        existingRoom.setRoomNumber(room.getRoomNumber());
+        existingRoom.setType(room.getType());
+        existingRoom.setPrice(room.getPrice());
+        existingRoom.setStatus(room.getStatus());
+        return roomRepository.save(existingRoom);
     }
 
     @Override
-    public void deleteRoom(Long id) {
-        // TODO: Implement delete room logic
+    public void deleteRoom(Integer id) {
+        roomRepository.deleteById(id);
     }
 
     @Override
-    public List<StaffController.Room> searchRooms(String type, Double minPrice, Double maxPrice, Integer capacity) {
-        // TODO: Implement search rooms logic
-        return null;
+    public List<Room> searchRooms(String type, Double minPrice, Double maxPrice, Integer capacity) {
+        List<Room> rooms = roomRepository.findAll();
+        return rooms.stream()
+                .filter(room -> (type == null || room.getType().equals(type)))
+                .filter(room -> (minPrice == null || room.getPrice() >= minPrice))
+                .filter(room -> (maxPrice == null || room.getPrice() <= maxPrice))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<StaffController.Room> getAvailableRooms(String checkInDate, String checkOutDate) {
-        // TODO: Implement get available rooms logic
-        return null;
+    public List<Room> getAvailableRooms(String checkInDate, String checkOutDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate checkIn = LocalDate.parse(checkInDate, formatter);
+        LocalDate checkOut = LocalDate.parse(checkOutDate, formatter);
+
+        return roomRepository.findAll().stream()
+                .filter(room -> room.getStatus().equals("AVAILABLE"))
+                .collect(Collectors.toList());
     }
 }

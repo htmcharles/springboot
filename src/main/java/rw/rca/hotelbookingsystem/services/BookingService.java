@@ -1,15 +1,14 @@
 package rw.rca.hotelbookingsystem.services;
 
-import rw.rca.hotelbookingsystem.models.Address;
-
+import rw.rca.hotelbookingsystem.models.Booking;
 import java.util.List;
 
 public interface BookingService {
-    Address.Booking createBooking(Address.Booking booking);
-    Address.Booking getBookingById(Long id);
-    List<Address.Booking> getUserBookings(Long userId);
-    Address.Booking cancelBooking(Long id);
-    Address.Booking checkIn(Long id);
-    Address.Booking checkOut(Long id);
-    List<Address.Booking> getRoomBookings(Long roomId);
+    Booking createBooking(Booking booking);
+    Booking getBookingById(Integer id);
+    List<Booking> getUserBookings(Integer userId);
+    Booking cancelBooking(Integer id);
+    Booking checkIn(Integer id);
+    Booking checkOut(Integer id);
+    List<Booking> getRoomBookings(Integer roomId);
 }

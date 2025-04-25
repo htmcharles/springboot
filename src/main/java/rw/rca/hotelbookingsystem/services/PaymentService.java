@@ -1,14 +1,13 @@
 package rw.rca.hotelbookingsystem.services;
 
-import rw.rca.hotelbookingsystem.models.Address;
-
+import rw.rca.hotelbookingsystem.models.Payment;
 import java.util.List;
 
 public interface PaymentService {
-    Address.Payment processPayment(Address.Payment payment);
-    Address.Payment getPaymentById(Long id);
-    List<Address.Payment> getPaymentsByBooking(Long bookingId);
-    Address.Payment processRefund(Long id);
-    List<Address.Payment> getUserPayments(Long userId);
-    List<Address.Payment> getPaymentsByStatus(String status);
+    Payment processPayment(Payment payment);
+    Payment getPaymentById(Integer id);
+    List<Payment> getPaymentsByBooking(Integer bookingId);
+    Payment processRefund(Integer id);
+    List<Payment> getPaymentsByGuest(Integer guestId);
+    List<Payment> getPaymentsByStatus(String status);
 }
