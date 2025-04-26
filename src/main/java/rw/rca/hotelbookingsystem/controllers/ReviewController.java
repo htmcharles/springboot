@@ -7,6 +7,7 @@ import rw.rca.hotelbookingsystem.models.Review;
 import rw.rca.hotelbookingsystem.services.ReviewService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -26,7 +27,7 @@ public class ReviewController {
     }
 
     @GetMapping("/room/{roomId}")
-    public ResponseEntity<List<Review>> getRoomReviews(@PathVariable Long roomId) {
+    public ResponseEntity<List<Map<String, Object>>> getRoomReviews(@PathVariable Long roomId) {
         return ResponseEntity.ok(reviewService.getRoomReviews(roomId));
     }
 

@@ -24,11 +24,6 @@ public class Booking {
     private Room room;
 
     @ManyToOne
-    @JoinColumn(name = "guest_id", nullable = false)
-    @JsonBackReference(value = "guest-bookings")
-    private Guest guest;
-
-    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference(value = "user-bookings")
     private User user;
@@ -48,10 +43,12 @@ public class Booking {
     @Column(name = "total_price")
     private Double totalPrice;
 
-    public Booking(Integer bookingID, Room room, Guest guest, User user, Date checkIn, Date checkOut, Double totalPrice) {
+    @Column(name = "additional_requests")
+    private String additionalRequests;
+
+    public Booking(Integer bookingID, Room room, User user, Date checkIn, Date checkOut, Double totalPrice) {
         this.bookingID = bookingID;
         this.room = room;
-        this.guest = guest;
         this.user = user;
         this.checkInDate = checkIn.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
         this.checkOut = checkOut;
@@ -77,14 +74,6 @@ public class Booking {
 
     public void setRoom(Room room) {
         this.room = room;
-    }
-
-    public Guest getGuest() {
-        return guest;
-    }
-
-    public void setGuest(Guest guest) {
-        this.guest = guest;
     }
 
     public User getUser() {
@@ -133,5 +122,13 @@ public class Booking {
 
     public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public String getAdditionalRequests() {
+        return additionalRequests;
+    }
+
+    public void setAdditionalRequests(String additionalRequests) {
+        this.additionalRequests = additionalRequests;
     }
 }

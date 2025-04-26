@@ -3,8 +3,10 @@ package rw.rca.hotelbookingsystem.services.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rw.rca.hotelbookingsystem.models.Booking;
+import rw.rca.hotelbookingsystem.models.Room;
 import rw.rca.hotelbookingsystem.repositories.BookingRepository;
 import rw.rca.hotelbookingsystem.services.BookingService;
+import rw.rca.hotelbookingsystem.services.RoomService;
 
 import java.util.List;
 
@@ -14,8 +16,18 @@ public class BookingServiceImpl implements BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private RoomService roomService;
+
     @Override
     public Booking createBooking(Booking booking) {
+        // Fetch the Room entity using the roomId from the booking
+        Room room = roomService.getRoomById(booking.getRoom().getId());
+        if (room == null) {
+            throw new RuntimeException("Room not found with ID: " + booking.getRoom().getId());
+        }
+        // Set the Room in the Booking
+        booking.setRoom(room);
         return bookingRepository.save(booking);
     }
 
@@ -27,7 +39,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Booking> getUserBookings(Integer userId) {
-        List<Booking> bookings = bookingRepository.findByGuestGuestID(userId);
+        List<Booking> bookings = bookingRepository.findByUserId(userId);
         if (bookings.isEmpty()) {
             throw new RuntimeException("No bookings found for user with ID: " + userId);
         }

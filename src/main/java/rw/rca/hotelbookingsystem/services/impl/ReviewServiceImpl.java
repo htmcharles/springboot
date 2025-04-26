@@ -10,7 +10,9 @@ import rw.rca.hotelbookingsystem.services.ReviewService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.HashMap;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -44,8 +46,15 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<Review> getRoomReviews(Long roomId) {
-        return reviewRepository.findByRoomId(roomId);
+    public List<Map<String, Object>> getRoomReviews(Long roomId) {
+        return reviewRepository.findByRoomId(roomId).stream().map(review -> {
+            Map<String, Object> simplifiedReview = new HashMap<>();
+            simplifiedReview.put("id", review.getId());
+            simplifiedReview.put("rating", review.getRating());
+            simplifiedReview.put("comment", review.getComment());
+            simplifiedReview.put("createdAt", review.getCreatedAt());
+            return simplifiedReview;
+        }).collect(Collectors.toList());
     }
 
     @Override

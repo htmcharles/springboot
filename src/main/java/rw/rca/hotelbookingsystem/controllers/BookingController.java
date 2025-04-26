@@ -11,10 +11,15 @@ import rw.rca.hotelbookingsystem.services.ReviewService;
 import rw.rca.hotelbookingsystem.models.Room;
 import rw.rca.hotelbookingsystem.models.User;
 import rw.rca.hotelbookingsystem.services.RoomService;
+import rw.rca.hotelbookingsystem.services.UserService;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.time.ZoneId;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -30,8 +35,52 @@ public class BookingController {
     @Autowired
     private RoomService roomService;
 
+    @Autowired
+    private UserService userService;
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Booking> createBooking(@RequestBody Booking booking) {
+    public ResponseEntity<Booking> createBooking(@RequestBody Map<String, Object> bookingData) {
+        Integer roomId = Integer.valueOf(bookingData.get("roomId").toString());
+        Long userId = Long.valueOf(bookingData.get("userId").toString());
+        String checkInDate = bookingData.get("checkInDate").toString();
+        String checkOutDate = bookingData.get("checkOutDate").toString();
+        String additionalRequests = bookingData.get("additionalRequests").toString();
+
+        // Fetch the Room object from the database
+        Room room = roomService.getRoomById(roomId);
+        if (room == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        // Create a new Booking object
+        Booking booking = new Booking();
+        booking.setRoom(room);
+        booking.setUser(new User());
+
+        // Parse the date strings into LocalDate objects
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate checkIn = LocalDate.parse(checkInDate, formatter);
+        LocalDate checkOut = LocalDate.parse(checkOutDate, formatter);
+
+        // Set the parsed LocalDate objects in the Booking
+        booking.setCheckInDate(checkIn);
+
+        // Convert LocalDate to Date
+        Date checkOutDateConverted = Date.from(checkOut.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        // Set the Date object in the Booking
+        booking.setCheckOut(checkOutDateConverted);
+        booking.setAdditionalRequests(additionalRequests);
+
+        // Fetch the existing User object from the database
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        // Set the User in the Booking
+        booking.setUser(user);
+
         return ResponseEntity.ok(bookingService.createBooking(booking));
     }
 

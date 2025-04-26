@@ -35,11 +35,6 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.processRefund(id));
     }
 
-    @GetMapping("/guest/{guestId}")
-    public ResponseEntity<List<Payment>> getPaymentsByGuest(@PathVariable Integer guestId) {
-        return ResponseEntity.ok(paymentService.getPaymentsByGuest(guestId));
-    }
-
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Payment>> getPaymentsByStatus(@PathVariable String status) {
         return ResponseEntity.ok(paymentService.getPaymentsByStatus(status));

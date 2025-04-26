@@ -43,15 +43,15 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<Payment> getPaymentsByGuest(Integer guestId) {
-        // Since we don't have a direct method for this, we'll need to get payments through bookings
-        return paymentRepository.findAll().stream()
-                .filter(payment -> payment.getBooking().getGuest().getGuestID().equals(guestId))
-                .toList();
+    public List<Payment> getPaymentsByStatus(String status) {
+        return paymentRepository.findByStatus(PaymentStatus.valueOf(status.toUpperCase()));
     }
 
     @Override
-    public List<Payment> getPaymentsByStatus(String status) {
-        return paymentRepository.findByStatus(PaymentStatus.valueOf(status.toUpperCase()));
+    public List<Payment> getPaymentsByUser(Integer userId) {
+        // Retrieve payments by filtering through bookings associated with the user
+        return paymentRepository.findAll().stream()
+                .filter(payment -> payment.getBooking().getUser().getId().equals(userId))
+                .toList();
     }
 }
