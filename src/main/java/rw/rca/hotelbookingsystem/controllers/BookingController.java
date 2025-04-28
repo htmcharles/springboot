@@ -72,6 +72,32 @@ public class BookingController {
         booking.setCheckOut(checkOutDateConverted);
         booking.setAdditionalRequests(additionalRequests);
 
+        // Calculate the number of days
+        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(checkIn, checkOut);
+
+        // Determine the base price per night based on room type
+        double basePrice;
+        switch (room.getType().toLowerCase()) {
+            case "deluxe":
+                basePrice = 100.0; // Example price for Deluxe
+                break;
+            case "suite":
+                basePrice = 150.0; // Example price for Suite
+                break;
+            case "standard":
+                basePrice = 80.0; // Example price for Standard
+                break;
+            default:
+                basePrice = room.getPrice(); // Fallback to room's price if type is unknown
+        }
+
+        // Calculate total price
+        int numberOfPeople = Integer.parseInt(bookingData.get("numberOfPeople").toString());
+        double totalPrice = basePrice * daysBetween * numberOfPeople;
+
+        // Set the total price in the Booking
+        booking.setTotalPrice(totalPrice);
+
         // Fetch the existing User object from the database
         User user = userService.getUserById(userId);
         if (user == null) {
