@@ -12,4 +12,5 @@ public interface ReviewService {
     Review updateReview(Long id, Review review);
     void deleteReview(Long id);
     Double getRoomAverageRating(Long roomId);
+    List<Review> getAllReviews();
 }

@@ -51,4 +51,9 @@ public class ReviewController {
     public ResponseEntity<Double> getRoomAverageRating(@PathVariable Long roomId) {
         return ResponseEntity.ok(reviewService.getRoomAverageRating(roomId));
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Review>> getAllReviews() {
+        return ResponseEntity.ok(reviewService.getAllReviews());
+    }
 }

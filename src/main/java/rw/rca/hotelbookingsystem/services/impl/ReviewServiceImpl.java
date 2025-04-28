@@ -59,7 +59,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public List<Review> getUserReviews(Long userId) {
-        List<Review> reviews = reviewRepository.findByUserId(userId);
+        List<Review> reviews = reviewRepository.findByUser_Id(userId);
         // Streamline the response to include only necessary details
         return reviews.stream().map(review -> {
             Review simplifiedReview = new Review();
@@ -68,6 +68,12 @@ public class ReviewServiceImpl implements ReviewService {
             simplifiedReview.setComment(review.getComment());
             simplifiedReview.setCreatedAt(review.getCreatedAt());
             simplifiedReview.setUpdatedAt(review.getUpdatedAt());
+
+            // Explicitly set the user
+            if (review.getUser() != null) {
+                simplifiedReview.setUser(review.getUser());
+            }
+
             // Set only essential room details
             Room room = new Room();
             room.setId(review.getRoom().getId());
@@ -97,5 +103,35 @@ public class ReviewServiceImpl implements ReviewService {
     public Double getRoomAverageRating(Long roomId) {
         Double average = reviewRepository.findAverageRatingByRoomId(roomId);
         return average != null ? average : 0.0;
+    }
+
+    @Override
+    public List<Review> getAllReviews() {
+        List<Review> allReviews = reviewRepository.findAll();
+
+        // Follow the same approach as in getUserReviews, but for all reviews
+        return allReviews.stream().map(review -> {
+            Review simplifiedReview = new Review();
+            simplifiedReview.setId(review.getId());
+            simplifiedReview.setRating(review.getRating());
+            simplifiedReview.setComment(review.getComment());
+            simplifiedReview.setCreatedAt(review.getCreatedAt());
+            simplifiedReview.setUpdatedAt(review.getUpdatedAt());
+
+            // Explicitly set the user when retrieving reviews
+            if (review.getUser() != null) {
+                simplifiedReview.setUser(review.getUser());
+            }
+
+            // Set room details
+            Room room = new Room();
+            room.setId(review.getRoom().getId());
+            room.setRoomNumber(review.getRoom().getRoomNumber());
+            room.setType(review.getRoom().getType());
+            room.setPrice(review.getRoom().getPrice());
+            simplifiedReview.setRoom(room);
+
+            return simplifiedReview;
+        }).collect(Collectors.toList());
     }
 }

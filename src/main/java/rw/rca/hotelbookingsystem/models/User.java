@@ -1,9 +1,7 @@
 package rw.rca.hotelbookingsystem.models;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +9,8 @@ import java.util.List;
 @Table(name = "users")
 @JsonIdentityInfo(
     generator = ObjectIdGenerators.PropertyGenerator.class,
-    property = "id"
+    property = "id",
+    scope = User.class
 )
 public class User {
     @Id
@@ -28,6 +27,7 @@ public class User {
     private String email;
 
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(nullable = false)
@@ -42,10 +42,12 @@ public class User {
 
     @JsonManagedReference(value = "user-bookings")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Booking> bookings = new ArrayList<>();
 
     @JsonManagedReference(value = "user-reviews")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
 
     // Default constructor

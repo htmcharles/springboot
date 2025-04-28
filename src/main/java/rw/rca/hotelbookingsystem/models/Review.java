@@ -2,6 +2,7 @@ package rw.rca.hotelbookingsystem.models;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 @Entity
@@ -31,6 +32,27 @@ public class Review {
 
     @Column
     private LocalDateTime updatedAt;
+
+    // Add these fields to expose user information
+    @JsonProperty("userId")
+    public Long getUserId() {
+        return user != null ? user.getId() : null;
+    }
+
+    @JsonProperty("userFirstName")
+    public String getUserFirstName() {
+        return user != null ? user.getFirstName() : null;
+    }
+
+    @JsonProperty("userLastName")
+    public String getUserLastName() {
+        return user != null ? user.getLastName() : null;
+    }
+
+    @JsonProperty("userEmail")
+    public String getUserEmail() {
+        return user != null ? user.getEmail() : null;
+    }
 
     // Default constructor
     public Review() {

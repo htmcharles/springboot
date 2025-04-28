@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
 import java.time.LocalDate;
 
@@ -45,6 +46,26 @@ public class Booking {
 
     @Column(name = "additional_requests")
     private String additionalRequests;
+
+    @JsonProperty("userId")
+    public Long getUserId() {
+        return user != null ? user.getId() : null;
+    }
+
+    @JsonProperty("userFirstName")
+    public String getUserFirstName() {
+        return user != null ? user.getFirstName() : null;
+    }
+
+    @JsonProperty("userLastName")
+    public String getUserLastName() {
+        return user != null ? user.getLastName() : null;
+    }
+
+    @JsonProperty("userEmail")
+    public String getUserEmail() {
+        return user != null ? user.getEmail() : null;
+    }
 
     public Booking(Integer bookingID, Room room, User user, Date checkIn, Date checkOut, Double totalPrice) {
         this.bookingID = bookingID;
