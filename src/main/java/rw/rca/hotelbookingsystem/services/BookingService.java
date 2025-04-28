@@ -11,4 +11,5 @@ public interface BookingService {
     Booking checkIn(Integer id);
     Booking checkOut(Integer id);
     List<Booking> getRoomBookings(Integer roomId);
+    List<Booking> getAllBookings();
 }

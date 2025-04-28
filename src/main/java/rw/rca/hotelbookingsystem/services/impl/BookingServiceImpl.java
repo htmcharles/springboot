@@ -90,4 +90,9 @@ public class BookingServiceImpl implements BookingService {
         }
         return bookings;
     }
+
+    @Override
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
+    }
 }

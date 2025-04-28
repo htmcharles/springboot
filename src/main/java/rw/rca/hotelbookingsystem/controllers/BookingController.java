@@ -140,6 +140,11 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getRoomBookings(roomId));
     }
 
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Booking>> getAllBookings() {
+        return ResponseEntity.ok(bookingService.getAllBookings());
+    }
+
     @PostMapping
     public ResponseEntity<?> createReview(@RequestBody Map<String, Object> reviewData) {
         Integer roomId = Integer.valueOf(reviewData.get("roomId").toString());
