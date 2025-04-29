@@ -2,15 +2,19 @@ package rw.rca.hotelbookingsystem.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rw.rca.hotelbookingsystem.models.Booking;
 import rw.rca.hotelbookingsystem.models.Room;
 import rw.rca.hotelbookingsystem.models.Staff;
+import rw.rca.hotelbookingsystem.repositories.BookingRepository;
 import rw.rca.hotelbookingsystem.repositories.RoomRepository;
+import rw.rca.hotelbookingsystem.services.ReviewService;
 import rw.rca.hotelbookingsystem.services.RoomService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,6 +23,12 @@ public class RoomServiceImpl implements RoomService {
 
     @Autowired
     private RoomRepository roomRepository;
+
+    @Autowired
+    private ReviewService reviewService;
+
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @Override
     public List<Room> getAllRooms() {
@@ -43,31 +53,38 @@ public class RoomServiceImpl implements RoomService {
         existingRoom.setType(room.getType());
         existingRoom.setPrice(room.getPrice());
         existingRoom.setStatus(room.getStatus());
+        existingRoom.setCapacity(room.getCapacity());
         return roomRepository.save(existingRoom);
     }
 
     @Override
     public void deleteRoom(Integer id) {
-        // Get the room first
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Room not found with ID: " + id));
+        Room room = getRoomById(id);
 
-        // Remove all staff assignments for this room
-        if (room.getAssignedStaff() != null && !room.getAssignedStaff().isEmpty()) {
-            // Create a new set to avoid ConcurrentModificationException
-            Set<Staff> staffToRemove = new HashSet<>(room.getAssignedStaff());
+        // Delete all reviews associated with this room
+        reviewService.getRoomReviews(id.longValue()).forEach(reviewMap -> {
+            Long reviewId = ((Number) reviewMap.get("id")).longValue();
+            reviewService.deleteReview(reviewId);
+        });
 
-            // Remove this room from each staff member's assigned rooms
-            for (Staff staff : staffToRemove) {
-                staff.getAssignedRooms().remove(room);
-                room.getAssignedStaff().remove(staff);
+        // Mark all bookings for this room as CANCELLED
+        List<Booking> bookings = bookingRepository.findByRoomId(id);
+        if (bookings != null && !bookings.isEmpty()) {
+            for (Booking booking : bookings) {
+                booking.setStatus("CANCELLED");
+                bookingRepository.save(booking);
             }
-
-            // Save the room to update the assignments
-            roomRepository.save(room);
         }
 
-        // Now it's safe to delete the room
+        // Remove all staff assignments
+        Set<Staff> assignedStaff = room.getAssignedStaff();
+        if (assignedStaff != null && !assignedStaff.isEmpty()) {
+            assignedStaff.forEach(staff -> {
+                staff.getAssignedRooms().remove(room);
+            });
+            room.getAssignedStaff().clear();
+        }
+
         roomRepository.deleteById(id);
     }
 
@@ -90,5 +107,25 @@ public class RoomServiceImpl implements RoomService {
         return roomRepository.findAll().stream()
                 .filter(room -> room.getStatus().equals("AVAILABLE"))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Room> getAvailableRooms() {
+        return roomRepository.findByStatus("AVAILABLE");
+    }
+
+    @Override
+    public List<Room> getRoomsByType(String type) {
+        return roomRepository.findByType(type);
+    }
+
+    @Override
+    public List<Room> getRoomsByPriceRange(Double minPrice, Double maxPrice) {
+        return roomRepository.findByPriceBetween(minPrice, maxPrice);
+    }
+
+    @Override
+    public List<Room> getRoomsByCapacity(Integer capacity) {
+        return roomRepository.findByCapacityGreaterThanEqual(capacity);
     }
 }

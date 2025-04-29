@@ -10,4 +10,5 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
     List<Room> findByPriceBetween(Double minPrice, Double maxPrice);
     List<Room> findByStatus(String status);
     List<Room> findByRoomNumber(String roomNumber);
+    List<Room> findByCapacityGreaterThanEqual(Integer capacity);
 }

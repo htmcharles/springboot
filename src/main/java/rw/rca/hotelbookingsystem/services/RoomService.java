@@ -11,4 +11,8 @@ public interface RoomService {
     void deleteRoom(Integer id);
     List<Room> searchRooms(String type, Double minPrice, Double maxPrice, Integer capacity);
     List<Room> getAvailableRooms(String checkInDate, String checkOutDate);
+    List<Room> getAvailableRooms();
+    List<Room> getRoomsByType(String type);
+    List<Room> getRoomsByPriceRange(Double minPrice, Double maxPrice);
+    List<Room> getRoomsByCapacity(Integer capacity);
 }
