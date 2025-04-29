@@ -3,12 +3,15 @@ package rw.rca.hotelbookingsystem.services.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rw.rca.hotelbookingsystem.models.Room;
+import rw.rca.hotelbookingsystem.models.Staff;
 import rw.rca.hotelbookingsystem.repositories.RoomRepository;
 import rw.rca.hotelbookingsystem.services.RoomService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,6 +48,26 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public void deleteRoom(Integer id) {
+        // Get the room first
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Room not found with ID: " + id));
+
+        // Remove all staff assignments for this room
+        if (room.getAssignedStaff() != null && !room.getAssignedStaff().isEmpty()) {
+            // Create a new set to avoid ConcurrentModificationException
+            Set<Staff> staffToRemove = new HashSet<>(room.getAssignedStaff());
+
+            // Remove this room from each staff member's assigned rooms
+            for (Staff staff : staffToRemove) {
+                staff.getAssignedRooms().remove(room);
+                room.getAssignedStaff().remove(staff);
+            }
+
+            // Save the room to update the assignments
+            roomRepository.save(room);
+        }
+
+        // Now it's safe to delete the room
         roomRepository.deleteById(id);
     }
 
