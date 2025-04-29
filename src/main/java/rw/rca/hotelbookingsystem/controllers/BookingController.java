@@ -93,7 +93,9 @@ public class BookingController {
 
         // Calculate total price
         int numberOfPeople = Integer.parseInt(bookingData.get("numberOfPeople").toString());
-        double totalPrice = basePrice * daysBetween * numberOfPeople;
+        double subtotalPrice = basePrice * daysBetween * numberOfPeople;
+        // Add 10% tax for Taxes & fees
+        double totalPrice = subtotalPrice * 1.1;
 
         // Set the total price in the Booking
         booking.setTotalPrice(totalPrice);
