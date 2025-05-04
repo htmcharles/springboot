@@ -18,9 +18,29 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment processPayment(Payment payment) {
-        payment.setStatus(PaymentStatus.COMPLETED);
+        if (payment.getBooking() == null) {
+            throw new IllegalArgumentException("Booking reference is required for payment processing");
+        }
+
+        if (payment.getAmount() == null || payment.getAmount() <= 0) {
+            throw new IllegalArgumentException("Valid payment amount is required");
+        }
+
+        if (payment.getPaymentMethod() == null || payment.getPaymentMethod().trim().isEmpty()) {
+            throw new IllegalArgumentException("Payment method is required");
+        }
+
+        // Set payment date and keep the PENDING status
         payment.setPaymentDate(LocalDateTime.now());
-        return paymentRepository.save(payment);
+
+        try {
+            // Save the payment with PENDING status
+            return paymentRepository.save(payment);
+        } catch (Exception e) {
+            payment.setStatus(PaymentStatus.FAILED);
+            paymentRepository.save(payment);
+            throw new RuntimeException("Payment processing failed: " + e.getMessage());
+        }
     }
 
     @Override
@@ -37,7 +57,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Payment processRefund(Integer id) {
         Payment payment = getPaymentById(id);
-        payment.setStatus(PaymentStatus.REFUNDED);
+        payment.setStatus(PaymentStatus.PARTIALLY_REFUNDED);
         payment.setRefundDate(LocalDateTime.now());
         return paymentRepository.save(payment);
     }
@@ -53,5 +73,27 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepository.findAll().stream()
                 .filter(payment -> payment.getBooking().getUser().getId().equals(userId))
                 .toList();
+    }
+
+    @Override
+    public List<Payment> getAllPayments() {
+        return paymentRepository.findAll();
+    }
+
+    @Override
+    public Payment updatePayment(Payment payment) {
+        if (payment.getBooking() == null) {
+            throw new IllegalArgumentException("Booking reference cannot be null");
+        }
+
+        if (payment.getAmount() == null || payment.getAmount() <= 0) {
+            throw new IllegalArgumentException("Valid payment amount is required");
+        }
+
+        if (payment.getPaymentMethod() == null || payment.getPaymentMethod().trim().isEmpty()) {
+            throw new IllegalArgumentException("Payment method is required");
+        }
+
+        return paymentRepository.save(payment);
     }
 }
