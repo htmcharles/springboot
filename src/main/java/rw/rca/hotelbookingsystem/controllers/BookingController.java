@@ -118,7 +118,7 @@ public class BookingController {
     }
 
     @GetMapping(value = "/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Booking>> getUserBookings(@PathVariable Integer userId) {
+    public ResponseEntity<List<Booking>> getUserBookings(@PathVariable Long userId) {
         return ResponseEntity.ok(bookingService.getUserBookings(userId));
     }
 

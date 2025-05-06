@@ -128,4 +128,22 @@ public class RoomServiceImpl implements RoomService {
     public List<Room> getRoomsByCapacity(Integer capacity) {
         return roomRepository.findByCapacityGreaterThanEqual(capacity);
     }
+
+    @Override
+    public Room updateRoomStatus(Integer id, String status) {
+        Room room = getRoomById(id);
+        if (status == null || status.trim().isEmpty()) {
+            throw new IllegalArgumentException("Status cannot be null or empty");
+        }
+
+        // Validate status
+        String upperStatus = status.toUpperCase();
+        if (!upperStatus.equals("AVAILABLE") && !upperStatus.equals("OCCUPIED") &&
+            !upperStatus.equals("MAINTENANCE") && !upperStatus.equals("OUT_OF_SERVICE")) {
+            throw new IllegalArgumentException("Invalid status. Allowed values are: AVAILABLE, OCCUPIED, MAINTENANCE, OUT_OF_SERVICE");
+        }
+
+        room.setStatus(upperStatus);
+        return roomRepository.save(room);
+    }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 public interface BookingService {
     Booking createBooking(Booking booking);
     Booking getBookingById(Integer id);
-    List<Booking> getUserBookings(Integer userId);
+    List<Booking> getUserBookings(Long userId);
     Booking cancelBooking(Integer id);
     Booking checkIn(Integer id);
     Booking checkOut(Integer id);

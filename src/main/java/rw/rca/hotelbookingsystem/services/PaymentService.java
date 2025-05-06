@@ -9,7 +9,7 @@ public interface PaymentService {
     List<Payment> getPaymentsByBooking(Integer bookingId);
     Payment processRefund(Integer id);
     List<Payment> getPaymentsByStatus(String status);
-    List<Payment> getPaymentsByUser(Integer userId);
+    List<Payment> getPaymentsByUser(Long userId);
     List<Payment> getAllPayments();
     Payment updatePayment(Payment payment);
 }

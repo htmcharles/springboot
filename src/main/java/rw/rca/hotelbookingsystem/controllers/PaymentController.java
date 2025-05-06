@@ -8,6 +8,7 @@ import rw.rca.hotelbookingsystem.models.Booking;
 import rw.rca.hotelbookingsystem.services.PaymentService;
 import rw.rca.hotelbookingsystem.services.BookingService;
 import rw.rca.hotelbookingsystem.models.PaymentStatus;
+import rw.rca.hotelbookingsystem.models.Room;
 
 import java.util.List;
 import java.util.Map;
@@ -83,6 +84,33 @@ public class PaymentController {
     @GetMapping("/all")
     public ResponseEntity<List<Payment>> getAllPayments() {
         return ResponseEntity.ok(paymentService.getAllPayments());
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getPaymentsByUser(@PathVariable Long userId) {
+        try {
+            List<Payment> payments = paymentService.getPaymentsByUser(userId);
+            return ResponseEntity.ok(payments);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error retrieving payments: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/room")
+    public ResponseEntity<?> getRoomDetailsByPaymentId(@PathVariable Integer id) {
+        try {
+            Payment payment = paymentService.getPaymentById(id);
+            if (payment.getBooking() == null) {
+                return ResponseEntity.badRequest().body("No booking associated with this payment");
+            }
+            Room room = payment.getBooking().getRoom();
+            if (room == null) {
+                return ResponseEntity.badRequest().body("No room associated with this payment's booking");
+            }
+            return ResponseEntity.ok(room);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error retrieving room details: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")

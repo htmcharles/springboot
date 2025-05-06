@@ -15,4 +15,5 @@ public interface RoomService {
     List<Room> getRoomsByType(String type);
     List<Room> getRoomsByPriceRange(Double minPrice, Double maxPrice);
     List<Room> getRoomsByCapacity(Integer capacity);
+    Room updateRoomStatus(Integer id, String status);
 }

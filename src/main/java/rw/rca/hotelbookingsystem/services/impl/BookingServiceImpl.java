@@ -38,12 +38,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getUserBookings(Integer userId) {
-        List<Booking> bookings = bookingRepository.findByUser_Id(userId);
-        if (bookings.isEmpty()) {
-            throw new RuntimeException("No bookings found for user with ID: " + userId);
-        }
-        return bookings;
+    public List<Booking> getUserBookings(Long userId) {
+        return bookingRepository.findByUser_Id(userId);
     }
 
     @Override

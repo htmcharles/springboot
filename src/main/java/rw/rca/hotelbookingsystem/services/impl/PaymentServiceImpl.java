@@ -35,7 +35,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         try {
             // Save the payment with PENDING status
-            return paymentRepository.save(payment);
+        return paymentRepository.save(payment);
         } catch (Exception e) {
             payment.setStatus(PaymentStatus.FAILED);
             paymentRepository.save(payment);
@@ -68,7 +68,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<Payment> getPaymentsByUser(Integer userId) {
+    public List<Payment> getPaymentsByUser(Long userId) {
         // Retrieve payments by filtering through bookings associated with the user
         return paymentRepository.findAll().stream()
                 .filter(payment -> payment.getBooking().getUser().getId().equals(userId))
