@@ -1,3 +1,7 @@
+/**
+ * REST Controller for handling user-related HTTP requests.
+ * Provides endpoints for user registration, authentication, and profile management.
+ */
 package rw.rca.hotelbookingsystem.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +24,20 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    /**
+     * Simple endpoint to test if the server is running
+     * @return A hello world message
+     */
     @GetMapping("/hello")
     public String hello() {
         return "Hello world";
     }
 
+    /**
+     * Handles user registration requests
+     * @param user The user object containing registration details
+     * @return ResponseEntity containing the registered user or error message
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
         try {
@@ -57,6 +70,11 @@ public class UserController {
         }
     }
 
+    /**
+     * Handles user login requests
+     * @param loginData The user object containing login credentials
+     * @return ResponseEntity containing the authenticated user or error message
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User loginData) {
         try {
@@ -96,6 +114,10 @@ public class UserController {
         }
     }
 
+    /**
+     * Retrieves all users in the system
+     * @return ResponseEntity containing list of all users
+     */
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getAllUsers();
@@ -103,6 +125,11 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    /**
+     * Retrieves a specific user by their ID
+     * @param id The ID of the user to retrieve
+     * @return ResponseEntity containing the user or error message
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         try {
@@ -114,6 +141,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Updates a user's information
+     * @param id The ID of the user to update
+     * @param user The user object containing updated information
+     * @return ResponseEntity containing the updated user or error message
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User user) {
         try {
@@ -126,6 +159,11 @@ public class UserController {
         }
     }
 
+    /**
+     * Deletes a user from the system
+     * @param id The ID of the user to delete
+     * @return ResponseEntity containing success or error message
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
@@ -136,6 +174,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Changes a user's password
+     * @param id The ID of the user
+     * @param request Object containing old and new passwords
+     * @return ResponseEntity containing success or error message
+     */
     @PutMapping("/{id}/change-password")
     public ResponseEntity<?> changePassword(
             @PathVariable Long id,
@@ -213,9 +257,13 @@ public class UserController {
     }
     */
 
-    // Keep PasswordChangeRequest inner class if needed
+    /**
+     * Inner class for password change requests
+     */
     private static class PasswordChangeRequest {
+        /** The user's current password */
         public String oldPassword;
+        /** The new password to set */
         public String newPassword;
     }
 }
