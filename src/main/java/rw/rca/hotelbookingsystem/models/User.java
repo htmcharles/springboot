@@ -1,3 +1,8 @@
+/**
+ * User entity representing a user in the hotel booking system.
+ * This class stores user information including personal details, authentication data,
+ * and relationships with bookings and reviews.
+ */
 package rw.rca.hotelbookingsystem.models;
 
 import jakarta.persistence.*;
@@ -13,38 +18,68 @@ import java.util.List;
     scope = User.class
 )
 public class User {
+    /**
+     * Unique identifier for the user
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * User's first name
+     */
     @Column(nullable = false)
     private String firstName;
 
+    /**
+     * User's last name
+     */
     @Column(nullable = false)
     private String lastName;
 
+    /**
+     * User's email address (unique)
+     */
     @Column(nullable = false, unique = true)
     private String email;
 
+    /**
+     * User's password (write-only for security)
+     */
     @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    /**
+     * User's contact phone number
+     */
     @Column(nullable = false)
     private String phoneNumber;
 
+    /**
+     * User's address information
+     */
     @Embedded
     private Address address;
 
+    /**
+     * User's role in the system (e.g., ADMIN, CUSTOMER)
+     */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
 
+    /**
+     * List of bookings made by the user
+     */
     @JsonManagedReference(value = "user-bookings")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Booking> bookings = new ArrayList<>();
 
+    /**
+     * List of reviews written by the user
+     */
     @JsonManagedReference(value = "user-reviews")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -146,22 +181,37 @@ public class User {
         this.reviews = reviews;
     }
 
-    // Helper methods
+    /**
+     * Adds a booking to the user's list of bookings
+     * @param booking The booking to add
+     */
     public void addBooking(Booking booking) {
         bookings.add(booking);
         booking.setUser(this);
     }
 
+    /**
+     * Removes a booking from the user's list of bookings
+     * @param booking The booking to remove
+     */
     public void removeBooking(Booking booking) {
         bookings.remove(booking);
         booking.setUser(null);
     }
 
+    /**
+     * Adds a review to the user's list of reviews
+     * @param review The review to add
+     */
     public void addReview(Review review) {
         reviews.add(review);
         review.setUser(this);
     }
 
+    /**
+     * Removes a review from the user's list of reviews
+     * @param review The review to remove
+     */
     public void removeReview(Review review) {
         reviews.remove(review);
         review.setUser(null);

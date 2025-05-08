@@ -1,3 +1,7 @@
+/**
+ * Staff entity representing hotel staff members in the system.
+ * This class manages staff information and their room assignments.
+ */
 package rw.rca.hotelbookingsystem.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,16 +19,32 @@ import java.util.Set;
 )
 public class Staff {
 
+    /**
+     * Unique identifier for the staff member
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generate ID if needed
     private Integer code;
 
+    /**
+     * Staff member's first name
+     */
     private String firstName;
+
+    /**
+     * Staff member's last name
+     */
     private String lastName;
 
+    /**
+     * Staff member's email address (unique)
+     */
     @Column(name = "email", nullable = false, length = 50, unique = true) // Added unique=true constraint
     private String email;
 
+    /**
+     * Set of rooms assigned to this staff member for maintenance/cleaning
+     */
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "staff_room_assignment",
@@ -34,10 +54,18 @@ public class Staff {
     @JsonIgnore
     private Set<Room> assignedRooms = new HashSet<>();
 
-    // Default constructor
+    /**
+     * Default constructor
+     */
     public Staff() {}
 
-    // Constructor with all fields
+    /**
+     * Constructor for creating a new staff member with all fields
+     * @param code Unique identifier for the staff member
+     * @param firstName Staff member's first name
+     * @param lastName Staff member's last name
+     * @param email Staff member's email address
+     */
     public Staff(Integer code, String firstName, String lastName, String email) {
         this.code = code;
         this.firstName = firstName;
@@ -45,7 +73,12 @@ public class Staff {
         this.email = email;
     }
 
-    // Alternative constructor
+    /**
+     * Alternative constructor for creating a new staff member
+     * @param email Staff member's email address
+     * @param lastName Staff member's last name
+     * @param firstName Staff member's first name
+     */
     public Staff(String email, String lastName, String firstName) {
         this.email = email;
         this.lastName = lastName;
@@ -93,11 +126,18 @@ public class Staff {
         this.assignedRooms = assignedRooms;
     }
 
-    // Helper methods for the relationship
+    /**
+     * Assigns a room to this staff member
+     * @param room The room to be assigned
+     */
     public void assignRoom(Room room) {
         this.assignedRooms.add(room);
     }
 
+    /**
+     * Removes a room assignment from this staff member
+     * @param room The room to be unassigned
+     */
     public void unassignRoom(Room room) {
         this.assignedRooms.remove(room);
     }

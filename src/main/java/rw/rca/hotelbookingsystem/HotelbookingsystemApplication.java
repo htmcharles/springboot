@@ -1,3 +1,8 @@
+/**
+ * Main application class for the Hotel Booking System.
+ * This class serves as the entry point for the Spring Boot application and contains
+ * configuration for CORS and initial data setup.
+ */
 package rw.rca.hotelbookingsystem;
 
 import org.springframework.boot.CommandLineRunner;
@@ -20,10 +25,19 @@ import java.util.List;
 @SpringBootApplication
 public class HotelbookingsystemApplication {
 
+	/**
+	 * Main method that starts the Spring Boot application.
+	 * @param args Command line arguments passed to the application
+	 */
 	public static void main(String[] args) {
 		SpringApplication.run(HotelbookingsystemApplication.class, args);
 	}
 
+	/**
+	 * Configures CORS (Cross-Origin Resource Sharing) settings for the application.
+	 * Allows requests from the frontend development server (localhost:5173).
+	 * @return WebMvcConfigurer with CORS configuration
+	 */
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
@@ -38,6 +52,17 @@ public class HotelbookingsystemApplication {
 		};
 	}
 
+	/**
+	 * Initializes sample data for the application if the database is empty.
+	 * Creates test users, rooms, bookings, payments, and reviews.
+	 *
+	 * @param userRepo Repository for managing users
+	 * @param roomRepo Repository for managing rooms
+	 * @param bookingRepo Repository for managing bookings
+	 * @param paymentRepo Repository for managing payments
+	 * @param reviewRepo Repository for managing reviews
+	 * @return CommandLineRunner that executes the initialization logic
+	 */
 	@Bean
 	CommandLineRunner initData(UserRepository userRepo, RoomRepository roomRepo,
 							 BookingRepository bookingRepo, PaymentRepository paymentRepo,

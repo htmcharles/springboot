@@ -1,3 +1,8 @@
+/**
+ * Room entity representing a hotel room in the booking system.
+ * This class stores room information including its type, price, status,
+ * and relationships with bookings and staff assignments.
+ */
 package rw.rca.hotelbookingsystem.models;
 
 import jakarta.persistence.*;
@@ -17,29 +22,53 @@ import java.util.Set;
 )
 public class Room {
 
+    /**
+     * Unique identifier for the room
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    /**
+     * Unique room number identifier
+     */
     @Column(name = "room_number", nullable = false, unique = true)
     private String roomNumber;
 
+    /**
+     * Type of the room (e.g., Standard, Deluxe, Suite)
+     */
     @Column(name = "type", nullable = false, length = 50)
     private String type;
 
+    /**
+     * Price per night for the room
+     */
     @Column(name = "price", nullable = false)
     private Double price;
 
+    /**
+     * Current status of the room (e.g., AVAILABLE, OCCUPIED, MAINTENANCE)
+     */
     @Column(name = "status", nullable = false, length = 20)
     private String status;
 
+    /**
+     * Maximum number of guests the room can accommodate
+     */
     @Column(name = "capacity")
     private Integer capacity;
 
+    /**
+     * List of bookings associated with this room
+     */
     @JsonManagedReference(value = "room-bookings")
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Booking> bookings = new ArrayList<>();
 
+    /**
+     * Set of staff members assigned to maintain this room
+     */
     @ManyToMany(mappedBy = "assignedRooms")
     private Set<Staff> assignedStaff = new HashSet<>();
 
@@ -122,13 +151,19 @@ public class Room {
         this.bookings = bookings;
     }
 
-    // Helper method to add booking
+    /**
+     * Adds a booking to the room's list of bookings
+     * @param booking The booking to add
+     */
     public void addBooking(Booking booking) {
         bookings.add(booking);
         booking.setRoom(this);
     }
 
-    // Helper method to remove booking
+    /**
+     * Removes a booking from the room's list of bookings
+     * @param booking The booking to remove
+     */
     public void removeBooking(Booking booking) {
         bookings.remove(booking);
         booking.setRoom(null);
