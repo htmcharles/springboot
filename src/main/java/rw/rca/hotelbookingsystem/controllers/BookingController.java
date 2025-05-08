@@ -1,3 +1,7 @@
+/**
+ * REST Controller for handling booking-related HTTP requests.
+ * Provides endpoints for creating and managing room bookings, including check-in/check-out operations.
+ */
 package rw.rca.hotelbookingsystem.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +42,11 @@ public class BookingController {
     @Autowired
     private UserService userService;
 
+    /**
+     * Creates a new booking in the system
+     * @param bookingData Map containing booking details (roomId, userId, checkInDate, checkOutDate, etc.)
+     * @return ResponseEntity containing the created booking or error message
+     */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Booking> createBooking(@RequestBody Map<String, Object> bookingData) {
         Integer roomId = Integer.valueOf(bookingData.get("roomId").toString());
@@ -112,41 +121,80 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.createBooking(booking));
     }
 
+    /**
+     * Retrieves a specific booking by its ID
+     * @param id The ID of the booking to retrieve
+     * @return ResponseEntity containing the booking
+     */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Booking> getBookingById(@PathVariable Integer id) {
         return ResponseEntity.ok(bookingService.getBookingById(id));
     }
 
+    /**
+     * Retrieves all bookings for a specific user
+     * @param userId The ID of the user to get bookings for
+     * @return ResponseEntity containing list of user's bookings
+     */
     @GetMapping(value = "/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Booking>> getUserBookings(@PathVariable Long userId) {
         return ResponseEntity.ok(bookingService.getUserBookings(userId));
     }
 
+    /**
+     * Cancels a booking
+     * @param id The ID of the booking to cancel
+     * @return ResponseEntity containing the updated booking
+     */
     @PutMapping(value = "/{id}/cancel", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Booking> cancelBooking(@PathVariable Integer id) {
         return ResponseEntity.ok(bookingService.cancelBooking(id));
     }
 
+    /**
+     * Processes check-in for a booking
+     * @param id The ID of the booking to check in
+     * @return ResponseEntity containing the updated booking
+     */
     @PutMapping(value = "/{id}/check-in", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Booking> checkIn(@PathVariable Integer id) {
         return ResponseEntity.ok(bookingService.checkIn(id));
     }
 
+    /**
+     * Processes check-out for a booking
+     * @param id The ID of the booking to check out
+     * @return ResponseEntity containing the updated booking
+     */
     @PutMapping(value = "/{id}/check-out", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Booking> checkOut(@PathVariable Integer id) {
         return ResponseEntity.ok(bookingService.checkOut(id));
     }
 
+    /**
+     * Retrieves all bookings for a specific room
+     * @param roomId The ID of the room to get bookings for
+     * @return ResponseEntity containing list of room's bookings
+     */
     @GetMapping(value = "/room/{roomId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Booking>> getRoomBookings(@PathVariable Integer roomId) {
         return ResponseEntity.ok(bookingService.getRoomBookings(roomId));
     }
 
+    /**
+     * Retrieves all bookings in the system
+     * @return ResponseEntity containing list of all bookings
+     */
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Booking>> getAllBookings() {
         return ResponseEntity.ok(bookingService.getAllBookings());
     }
 
+    /**
+     * Creates a new review for a room
+     * @param reviewData Map containing review details (roomId, userId, rating, comment)
+     * @return ResponseEntity containing the created review or error message
+     */
     @PostMapping
     public ResponseEntity<?> createReview(@RequestBody Map<String, Object> reviewData) {
         Integer roomId = Integer.valueOf(reviewData.get("roomId").toString());

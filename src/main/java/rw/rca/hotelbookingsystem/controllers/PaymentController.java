@@ -1,3 +1,7 @@
+/**
+ * REST Controller for handling payment-related HTTP requests.
+ * Provides endpoints for processing payments, refunds, and payment management.
+ */
 package rw.rca.hotelbookingsystem.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,11 @@ public class PaymentController {
     @Autowired
     private BookingService bookingService;
 
+    /**
+     * Processes a new payment for a booking
+     * @param paymentRequest Map containing payment details (bookingId, amount, paymentMethod)
+     * @return ResponseEntity containing the processed payment or error message
+     */
     @PostMapping
     public ResponseEntity<?> processPayment(@RequestBody Map<String, Object> paymentRequest) {
         try {
@@ -51,16 +60,31 @@ public class PaymentController {
         }
     }
 
+    /**
+     * Retrieves a specific payment by its ID
+     * @param id The ID of the payment to retrieve
+     * @return ResponseEntity containing the payment
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Payment> getPaymentById(@PathVariable Integer id) {
         return ResponseEntity.ok(paymentService.getPaymentById(id));
     }
 
+    /**
+     * Retrieves all payments for a specific booking
+     * @param bookingId The ID of the booking to get payments for
+     * @return ResponseEntity containing list of payments for the booking
+     */
     @GetMapping("/booking/{bookingId}")
     public ResponseEntity<List<Payment>> getPaymentsByBooking(@PathVariable Integer bookingId) {
         return ResponseEntity.ok(paymentService.getPaymentsByBooking(bookingId));
     }
 
+    /**
+     * Processes a refund for a booking's most recent payment
+     * @param bookingId The ID of the booking to process refund for
+     * @return ResponseEntity containing the refunded payment or error message
+     */
     @PostMapping("/booking/{bookingId}/refund")
     public ResponseEntity<?> processRefund(@PathVariable Integer bookingId) {
         try {
@@ -76,16 +100,30 @@ public class PaymentController {
         }
     }
 
+    /**
+     * Retrieves all payments with a specific status
+     * @param status The payment status to search for
+     * @return ResponseEntity containing list of payments with the specified status
+     */
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Payment>> getPaymentsByStatus(@PathVariable String status) {
         return ResponseEntity.ok(paymentService.getPaymentsByStatus(status));
     }
 
+    /**
+     * Retrieves all payments in the system
+     * @return ResponseEntity containing list of all payments
+     */
     @GetMapping("/all")
     public ResponseEntity<List<Payment>> getAllPayments() {
         return ResponseEntity.ok(paymentService.getAllPayments());
     }
 
+    /**
+     * Retrieves all payments made by a specific user
+     * @param userId The ID of the user to get payments for
+     * @return ResponseEntity containing list of user's payments or error message
+     */
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getPaymentsByUser(@PathVariable Long userId) {
         try {
@@ -96,6 +134,11 @@ public class PaymentController {
         }
     }
 
+    /**
+     * Retrieves room details associated with a payment
+     * @param id The ID of the payment to get room details for
+     * @return ResponseEntity containing the room details or error message
+     */
     @GetMapping("/{id}/room")
     public ResponseEntity<?> getRoomDetailsByPaymentId(@PathVariable Integer id) {
         try {
@@ -113,6 +156,12 @@ public class PaymentController {
         }
     }
 
+    /**
+     * Updates an existing payment's information
+     * @param id The ID of the payment to update
+     * @param updateRequest Map containing updated payment details (amount, paymentMethod, status)
+     * @return ResponseEntity containing the updated payment or error message
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePayment(@PathVariable Integer id, @RequestBody Map<String, Object> updateRequest) {
         try {
