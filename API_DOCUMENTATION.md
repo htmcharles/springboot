@@ -245,7 +245,20 @@ All API endpoints are prefixed with `/api`
     "returnCondition": "string" // Required only when status is RETURNED
 }
 ```
-- **Response:** Updated request object
+- **Success Response:** Updated request object
+- **Error Response:** (400 Bad Request)
+```json
+{
+    "message": "string", // Detailed error message explaining why the status change is not allowed
+    "currentStatus": "string", // Current status of the request
+    "requestedStatus": "string" // Status that was requested
+}
+```
+- **Status Transition Rules:**
+  - PENDING → APPROVED: Valid
+  - PENDING → REJECTED: Valid
+  - APPROVED → RETURNED: Valid
+  - All other transitions: Invalid
 
 ### Get User's Requests
 - **Endpoint:** `/api/requests/user/{userId}`

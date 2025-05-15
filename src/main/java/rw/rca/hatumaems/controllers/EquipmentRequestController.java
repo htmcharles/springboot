@@ -14,6 +14,8 @@ import rw.rca.hatumaems.services.EquipmentRequestService;
 import rw.rca.hatumaems.services.EquipmentService;
 import rw.rca.hatumaems.services.UserService;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/requests")
@@ -62,16 +64,41 @@ public class EquipmentRequestController {
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<EquipmentRequest> updateRequestStatus(
+    public ResponseEntity<?> updateRequestStatus(
             @PathVariable Long id,
             @RequestBody StatusUpdateDTO statusUpdate) {
-        return ResponseEntity.ok(
-            requestService.updateRequestStatus(
-                id,
-                statusUpdate.getStatus(),
-                statusUpdate.getReturnCondition()
-            )
+        EquipmentRequest request = requestService.getRequestById(id);
+        String currentStatus = request.getStatus();
+        String newStatus = statusUpdate.getStatus();
+
+        // Check if the status transition is valid
+        boolean isValidTransition = switch (newStatus) {
+            case "APPROVED" -> "PENDING".equals(currentStatus);
+            case "REJECTED" -> "PENDING".equals(currentStatus);
+            case "RETURNED" -> "APPROVED".equals(currentStatus);
+            default -> false;
+        };
+
+        if (!isValidTransition) {
+            Map<String, String> response = new HashMap<>();
+            String message = switch (newStatus) {
+                case "APPROVED" -> String.format("Cannot approve request. Current status is %s. Only PENDING requests can be approved.", currentStatus);
+                case "REJECTED" -> String.format("Cannot reject request. Current status is %s. Only PENDING requests can be rejected.", currentStatus);
+                case "RETURNED" -> String.format("Cannot return request. Current status is %s. Only APPROVED requests can be returned.", currentStatus);
+                default -> "Invalid status: " + newStatus;
+            };
+            response.put("message", message);
+            response.put("currentStatus", currentStatus);
+            response.put("requestedStatus", newStatus);
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        EquipmentRequest updatedRequest = requestService.updateRequestStatus(
+            id,
+            statusUpdate.getStatus(),
+            statusUpdate.getReturnCondition()
         );
+        return ResponseEntity.ok(updatedRequest);
     }
 
     @GetMapping("/pending")

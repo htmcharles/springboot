@@ -82,13 +82,39 @@ public class EquipmentRequestService {
                 .orElseThrow(() -> new RuntimeException("Request not found"));
 
         String oldStatus = request.getStatus();
+
+        // Check if the status transition is valid
+        boolean isValidTransition = switch (newStatus) {
+            case "APPROVED" -> "PENDING".equals(oldStatus);
+            case "REJECTED" -> "PENDING".equals(oldStatus);
+            case "RETURNED" -> "APPROVED".equals(oldStatus);
+            default -> false;
+        };
+
+        // If transition is not valid, return the request without changes
+        if (!isValidTransition) {
+            String message = switch (newStatus) {
+                case "APPROVED" -> "Can only approve pending requests. Current status: " + oldStatus;
+                case "REJECTED" -> "Can only reject pending requests. Current status: " + oldStatus;
+                case "RETURNED" -> "Can only return approved requests. Current status: " + oldStatus;
+                default -> "Invalid status: " + newStatus;
+            };
+
+            // Log the invalid transition attempt
+            auditLogService.logAllocation(
+                request.getEquipment(),
+                request.getRequester(),
+                "Status Update Failed",
+                String.format("Failed to update status to %s - %s", newStatus, message)
+            );
+
+            return request; // Return unchanged request
+        }
+
         request.setStatus(newStatus);
 
         switch (newStatus) {
             case "APPROVED":
-                if (!"PENDING".equals(oldStatus)) {
-                    throw new RuntimeException("Can only approve pending requests");
-                }
                 request.setApprovalDate(LocalDateTime.now());
                 equipmentService.decreaseQuantity(request.getEquipment().getId(), 1);
 
@@ -104,9 +130,6 @@ public class EquipmentRequestService {
                 break;
 
             case "RETURNED":
-                if (!"APPROVED".equals(oldStatus)) {
-                    throw new RuntimeException("Can only return approved requests");
-                }
                 request.setReturnDate(LocalDateTime.now());
                 request.setReturnCondition(returnCondition);
                 equipmentService.increaseQuantity(request.getEquipment().getId(), 1, returnCondition);
@@ -123,9 +146,6 @@ public class EquipmentRequestService {
                 break;
 
             case "REJECTED":
-                if (!"PENDING".equals(oldStatus)) {
-                    throw new RuntimeException("Can only reject pending requests");
-                }
                 request.setApprovalDate(LocalDateTime.now());
 
                 // Log rejection
@@ -137,9 +157,6 @@ public class EquipmentRequestService {
                         request.getEquipment().getName())
                 );
                 break;
-
-            default:
-                throw new RuntimeException("Invalid status: " + newStatus);
         }
 
         return requestRepository.save(request);
